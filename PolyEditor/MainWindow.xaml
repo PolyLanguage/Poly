@@ -1,0 +1,44 @@
+﻿<hc:Window x:Class="PolyEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:local="clr-namespace:PolyEditor"
+        mc:Ignorable="d"
+        Title="Poly Editor   " Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <DockPanel>
+        <hc:TabControl Name="TabsNav" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ShowCloseButton="True" ShowContextMenu="True"/>
+    </DockPanel>
+
+    <!--Menu-->
+    <hc:Window.NonClientAreaContent>
+        <StackPanel VerticalAlignment="Stretch" Orientation="Horizontal">
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem Header="New" Click="NewFile_Click"/>
+                    <MenuItem Header="Open" Click="OpenFile_Click"/>
+                    <MenuItem Header="Save" Click="SaveFile_Click" hc:GlobalShortcut.Host="True">
+                        <hc:GlobalShortcut.KeyBindings>
+                            <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFile_Click}"/>
+                        </hc:GlobalShortcut.KeyBindings>
+                    </MenuItem>
+                    <MenuItem Header="Save As..." Click="SaveAsFile_Click"/>
+                    <MenuItem Header="Save All" Click="SaveAllFile_Click"/>
+                    <Separator/>
+                    <MenuItem Header="View Syntax Tree" Click="ViewAST_Click"/>
+                </MenuItem>
+                <MenuItem Header="Edit">
+                    <MenuItem Header="Undo"/>
+                    <MenuItem Header="Redo"/>
+                </MenuItem>
+                <MenuItem Header="Editor">
+                    <MenuItem Header="Theme">
+                        <MenuItem Header="Dark" Click="DarkSkin_Click"/>
+                        <MenuItem Header="Light" Click="LightSkin_Click"/>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+    </hc:Window.NonClientAreaContent>
+</hc:Window>
