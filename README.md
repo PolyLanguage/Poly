@@ -32,7 +32,7 @@ class car
     method reset_name()
     {
         self.name = '';
-    ]
+    }
 }
 class ferrari : car
 {
