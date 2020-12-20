@@ -13,23 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Toolkit", "Toolkit", "{1F87
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{36A8EE57-B12A-4DC6-9114-1D6F003B7D60}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{ED90DC84-0CF4-4B02-A36A-D8BA395B3EFC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkit", "PolyToolkit\PolyToolkit.csproj", "{6DD4D3AB-DBB5-4213-A677-B6E8D8D0F9A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{B756475D-0F39-446B-BB71-273187136CDC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkit.Compilation.LIR", "PolyToolkit.Compilation.LIR\PolyToolkit.Compilation.LIR.csproj", "{83CFB1B3-D439-400D-9691-FB5C2DF8DFCA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkitX", "PolyToolkitX\PolyToolkitX.csproj", "{67073059-3528-42E1-93B3-155526893594}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "First Gen", "First Gen", "{AABA138A-D982-46D1-8D4B-7E7B4D54CA47}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "X Gen", "X Gen", "{C2EA135E-DDC8-434A-B710-7025B0EE55E5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyToolkitX.Tests", "PolyToolkitX.Tests\PolyToolkitX.Tests.csproj", "{8EC7D27B-C619-40F5-9A56-334BC70615D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyToolkitX.Services.Packing", "PolyToolkitX.Services.Packing\PolyToolkitX.Services.Packing.csproj", "{800B3B8C-C647-45FA-8996-542896A44155}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
