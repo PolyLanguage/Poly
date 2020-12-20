@@ -7,18 +7,16 @@ using System.Threading.Tasks;
 namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
-    /// Example: "hello"
+    /// Example: import: "System";
     /// </summary>
-    public class StaticStringNode : IAstNode
+    public class ImportStatementNode : IAstNode
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
+        public List<IAstNode> Childs { get { return new List<IAstNode>() { ImportValue }; } }
+        public StringLiteralNode ImportValue { get; set; }
 
-        public string Value { get; }
-
-        public StaticStringNode(IAstNode parent, string val)
+        public ImportStatementNode(IAstNode parent)
         {
-            Value = val;
             Parent = parent;
         }
     }

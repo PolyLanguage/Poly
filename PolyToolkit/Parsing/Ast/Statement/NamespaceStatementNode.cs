@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace PolyToolkit.Parsing.Ast
 {
-    public class ArgumentsNode : IAstNode
+    public class NamespaceStatementNode : IAstNode
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return Args.ToIAstList<ArgumentNode>(); } }
-        public List<ArgumentNode> Args { get; set; }
+        public List<IAstNode> Childs { get { return new List<IAstNode>() { NamespaceValue }; } }
 
-        public ArgumentsNode(IAstNode parent)
+        public StringLiteralNode NamespaceValue { get; set; }
+
+        public NamespaceStatementNode(IAstNode parent)
         {
-            Args = new List<ArgumentNode>();
             Parent = parent;
         }
     }

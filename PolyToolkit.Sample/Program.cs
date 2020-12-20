@@ -20,8 +20,8 @@ namespace PolyToolkit.Sample
             Console.WriteLine("Step Log ? (true/sa/-)");
             Console.Write("> ");
             string stepLogStr = Console.ReadLine();
-            bool stepLog = false;
-            bool actLog = false;
+            bool stepLog = true;
+            bool actLog = true;
             if (stepLogStr == "true")
                 stepLog = true;
             if (stepLogStr != "sa")
@@ -34,7 +34,7 @@ namespace PolyToolkit.Sample
             }
             Console.WriteLine("[Parsing (" + stepLog + actLog + ")]");
 
-            string srcpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\polysrc";
+            string srcpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "polysrc";
             Console.WriteLine("Constructing code tree...");
 
             PolyProgram program = new PolyProgram("TestProgram",srcpath);

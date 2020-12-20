@@ -9,4 +9,13 @@
     <PackageReference Include="LLVMSharp" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Parsing\Ast\Node\Variable\" />
+    <Folder Include="Parsing\Ast\Node\Method\" />
+    <Folder Include="Parsing\Ast\Node\Expression\" />
+    <Folder Include="Parsing\Ast\Node\Class\" />
+    <Folder Include="Parsing\Ast\Node\Value\" />
+    <Folder Include="Parsing\Ast\Node\Expression\Value\" />
+    <Folder Include="Parsing\Ast\Node\Expression\Operation\" />
+  </ItemGroup>
 </Project>

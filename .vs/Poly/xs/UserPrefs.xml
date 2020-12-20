@@ -1,0 +1,50 @@
+﻿<Properties StartupConfiguration="{F8FDBC56-E420-460C-9923-28EFBFEF988A}|Default">
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Poly" expanded="True">
+            <Node name="Samples" expanded="True">
+              <Node name="PolyToolkit.Sample" expanded="True" />
+            </Node>
+            <Node name="Toolkit" expanded="True">
+              <Node name="First Gen" expanded="True">
+                <Node name="PolyToolkit" expanded="True">
+                  <Node name="Evaluation" expanded="True">
+                    <Node name="Expression" expanded="True">
+                      <Node name="Actions" expanded="True" />
+                    </Node>
+                  </Node>
+                  <Node name="Other" expanded="True">
+                    <Node name="PolyType" expanded="True" />
+                  </Node>
+                  <Node name="Parsing" expanded="True">
+                    <Node name="Ast" expanded="True">
+                      <Node name="Base" expanded="True" />
+                      <Node name="Node" expanded="True">
+                        <Node name="Expression" expanded="True">
+                          <Node name="Value" expanded="True" />
+                        </Node>
+                        <Node name="Method" expanded="True" />
+                        <Node name="Variable" expanded="True" />
+                      </Node>
+                    </Node>
+                    <Node name="PolyParser.cs" selected="True" />
+                  </Node>
+                </Node>
+                <Node name="PolyToolkit.Tests" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Samples.PolyToolkit.Sample PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

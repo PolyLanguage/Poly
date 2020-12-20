@@ -12,17 +12,12 @@ namespace PolyToolkit.Parsing.Ast
     public class VarDeclarationNode : IAstNode
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { VarType, VarName, VarValue }; } }
+        public List<IAstNode> Childs { get { return new List<IAstNode>() { VarValue }; } }
 
-        public TypenameNode VarType { get; set; }
-        public NameNode VarName { get; set; }
+        public string VarName { get; set; }
+        public PolyType VarType { get; set; }
         public IExpressionNode VarValue { get; set; }
-        /// <summary>
-        /// Throws exception if type mismatch
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="varname"></param>
-        /// <param name="value"></param>
+
         public VarDeclarationNode(IAstNode parent)
         {
             Parent = parent;
@@ -34,7 +29,7 @@ namespace PolyToolkit.Parsing.Ast
         /// <returns></returns>
         public bool IsTypesValid()
         {
-            return VarType.Type == VarValue.Expression.Type;
+            return VarType == VarValue.Type;
         }
     }
 }

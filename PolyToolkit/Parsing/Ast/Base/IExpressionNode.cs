@@ -8,5 +8,10 @@ using PolyToolkit.Evaluation;
 namespace PolyToolkit.Parsing.Ast
 {
     public interface IExpressionNode : IAstNode
-    { IExpression Expression { get; } }
+    {
+        /// <summary>
+        /// Type of the expression
+        /// </summary>
+        PolyType Type { get; }
+    }
 }

@@ -12,17 +12,14 @@ namespace PolyToolkit.Parsing.Ast
     public class MethodNode : IAstNode,IWithBody
     {
         public IAstNode Parent { get; set; }
-        public TypenameNode MethodReturnType { get; set; }
-        public NameNode MethodName { get; set; }
-        public ArgumentsNode MethodArgs { get; set; }
+        public PolyType MethodReturnType { get; set; }
+        public string MethodName { get; set; }
+        public Dictionary<string,PolyType> MethodArgs { get; set; }
         public List<IAstNode> Childs
         {
             get
             {
                 List<IAstNode> res = new List<IAstNode>();
-                res.Add(MethodReturnType);
-                res.Add(MethodName);
-                res.Add(MethodArgs);
                 res.Add(Body);
                 return res;
             }

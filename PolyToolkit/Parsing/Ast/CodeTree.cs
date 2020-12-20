@@ -43,24 +43,25 @@ namespace PolyToolkit.Parsing.Ast
 
             //content
             string content = "";
-            if (node is TypenameNode)
-                content = "(" + ((TypenameNode)node).Type.Name + ")";
-            else if (node is NameNode)
-                content = "(" + ((NameNode)node).Value + ")";
-            else if (node is ExpressionNode)
-            {
-                System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
-                timer.Start();
-                object evalRes = ((ExpressionNode)node).Expression.Evaluate(new Evaluation.DefaultContext());
-                timer.Stop();
-                content = "(" + evalRes + ":"+timer.ElapsedMilliseconds+"ms)";
-            }
+            if (node is StringLiteralNode)
+                content = "(" + ((StringLiteralNode)node).Value + ")";
+            else if (node is IntLiteralNode)
+                content = "(" + ((IntLiteralNode)node).Value + ")";
+            else if (node is RealLiteralNode)
+                content = "(" + ((RealLiteralNode)node).Value + ")";
+            else if (node is BoolLiteralNode)
+                content = "(" + ((BoolLiteralNode)node).Value + ")";
+            else if (node is NullLiteralNode)
+                content = "(null)";
 
             //print current node
-            Console.WriteLine(lvlstr+node.ToString().Replace("PolyToolkit.Parsing.Ast.","")+content);
-            //print childs
-            foreach (IAstNode child in node.Childs)
-                PrintNode(child, lvl + 1);
+            if (node != null)
+            {
+                Console.WriteLine(lvlstr + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
+                //print childs
+                foreach (IAstNode child in node.Childs)
+                    PrintNode(child, lvl + 1);
+            }
         }
 
         public bool IsAllowed<T>() where T : IAstNode
