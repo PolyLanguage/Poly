@@ -10,7 +10,8 @@ using PolyToolkit.Parsing;
 using PolyToolkit.Parsing.Ast;
 namespace PolyToolkit.Compilation
 {
-    public class PolyCodefile
+
+    public sealed class PolyCodefile
     {
         public string FilePath { get; }
         public string FileName { get; }

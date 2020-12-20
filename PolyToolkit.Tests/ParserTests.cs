@@ -22,7 +22,7 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(2, res.Body.Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[0] is ImportStatementNode);
+            Assert.IsTrue(res.Body.Childs[0] is ImportStmtNode);
 
             //errors
             Assert.AreEqual(0, parser.Log.Errors.Count);
@@ -40,7 +40,7 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(2, res.Body.Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[1] is NamespaceStatementNode);
+            Assert.IsTrue(res.Body.Childs[1] is NamespaceStmtNode);
 
             //errors
             Assert.AreEqual(0, parser.Log.Errors.Count);
@@ -174,7 +174,7 @@ namespace PolyToolkit.Tests
         }
 
         [TestMethod]
-        public void ParseVarDeclarationNode()
+        public void ParseVarDeclarationStmtNode()
         {
             string code = "import: 'System';\n" +
                 "namespace: 'Test';\n" +
@@ -200,7 +200,7 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(1, res.Body.Childs[2].Childs[1].Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationStmtNode);
 
             //errors
             Assert.AreEqual(0, parser.Log.Errors.Count);
@@ -238,15 +238,15 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(2, res.Body.Childs[2].Childs[1].Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[0];
+            VarDeclarationStmtNode decl = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[0];
             Assert.AreEqual(220, decl.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl2 = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[1];
+            VarDeclarationStmtNode decl2 = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[1];
             Assert.AreEqual(10, decl2.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //errors
@@ -282,15 +282,15 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(2, res.Body.Childs[2].Childs[1].Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[0];
+            VarDeclarationStmtNode decl = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[0];
             Assert.AreEqual(true, decl.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl2 = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[1];
+            VarDeclarationStmtNode decl2 = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[1];
             Assert.AreEqual(false, decl2.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //errors
@@ -326,15 +326,15 @@ namespace PolyToolkit.Tests
             Assert.AreEqual(2, res.Body.Childs[2].Childs[1].Childs.Count);
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[0] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[0];
+            VarDeclarationStmtNode decl = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[0];
             Assert.AreEqual(true, decl.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //check type
-            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationNode);
+            Assert.IsTrue(res.Body.Childs[2].Childs[1].Childs[1] is VarDeclarationStmtNode);
             //check result
-            VarDeclarationNode decl2 = (VarDeclarationNode)res.Body.Childs[2].Childs[1].Childs[1];
+            VarDeclarationStmtNode decl2 = (VarDeclarationStmtNode)res.Body.Childs[2].Childs[1].Childs[1];
             Assert.AreEqual(false, decl2.VarValue.Expression.Evaluate(new Evaluation.DefaultContext()));
 
             //errors

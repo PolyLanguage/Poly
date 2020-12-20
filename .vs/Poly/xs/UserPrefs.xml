@@ -1,5 +1,10 @@
 ﻿<Properties StartupConfiguration="{F8FDBC56-E420-460C-9923-28EFBFEF988A}|Default">
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit/Parsing/Ast/Node/Expression/BinaryExpressionNode.cs">
+    <Files>
+      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/Operation/MultiplyExpressionNode.cs" Line="26" Column="24" />
+      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/ArithmeticExpressionNode.cs" Line="20" Column="9" />
+      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/BinaryExpressionNode.cs" Line="1" Column="1" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
@@ -15,24 +20,19 @@
                       <Node name="Actions" expanded="True" />
                     </Node>
                   </Node>
-                  <Node name="Other" expanded="True">
-                    <Node name="PolyType" expanded="True" />
-                  </Node>
                   <Node name="Parsing" expanded="True">
                     <Node name="Ast" expanded="True">
-                      <Node name="Base" expanded="True" />
                       <Node name="Node" expanded="True">
                         <Node name="Expression" expanded="True">
-                          <Node name="Value" expanded="True" />
+                          <Node name="Operation" expanded="True">
+                            <Node name="Boolean" expanded="True" />
+                          </Node>
+                          <Node name="BinaryExpressionNode.cs" selected="True" />
                         </Node>
-                        <Node name="Method" expanded="True" />
-                        <Node name="Variable" expanded="True" />
                       </Node>
                     </Node>
-                    <Node name="PolyParser.cs" selected="True" />
                   </Node>
                 </Node>
-                <Node name="PolyToolkit.Tests" expanded="True" />
               </Node>
             </Node>
           </Node>

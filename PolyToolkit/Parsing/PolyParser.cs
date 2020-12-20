@@ -57,7 +57,7 @@ namespace PolyToolkit.Parsing
                 //its import stmt or class
                 if (node is UnknownNode == false)
                 {
-                    if(node is NamespaceStatementNode == false)
+                    if(node is NamespaceStmtNode == false)
                         CurrentTree.Body.Childs.Add(node);
                     else
                     {
@@ -105,7 +105,7 @@ namespace PolyToolkit.Parsing
             //import
             else if (token.Type == PolyTokenType.Name && token.Value == "import")
             {
-                if (parent.IsAllowed<ImportStatementNode>())
+                if (parent.IsAllowed<ImportStmtNode>())
                 {
                     StepSuccess();
                     return ParseImportStmt(parent);
@@ -116,7 +116,7 @@ namespace PolyToolkit.Parsing
             //namespace
             else if (token.Type == PolyTokenType.Name && token.Value == "namespace")
             {
-                if (parent.IsAllowed<NamespaceStatementNode>())
+                if (parent.IsAllowed<NamespaceStmtNode>())
                 {
                     StepSuccess();
                     return ParseNamespaceStmt(parent);
@@ -127,7 +127,7 @@ namespace PolyToolkit.Parsing
             //var declaration (<TYPE> <NAME> = <EXPRESSION>;)
             else if (token.Type == PolyTokenType.Name && PolyType.IsItTypeName(token.Value))
             {
-                if (parent.IsAllowed<VarDeclarationNode>())
+                if (parent.IsAllowed<VarDeclarationStmtNode>())
                 {
                     PushToken(token);
                     return ParseVarDeclaration(parent);
@@ -139,7 +139,7 @@ namespace PolyToolkit.Parsing
             else if(token.Type == PolyTokenType.Name && 
                 CurrentTree.IsVariableAvailable(token.Value))
             {
-                if (parent.IsAllowed<VarAssignNode>())
+                if (parent.IsAllowed<VarAssignStmtNode>())
                 {
                     PushToken(token);
                     return ParseVarAssignation(parent);
@@ -185,10 +185,10 @@ namespace PolyToolkit.Parsing
         }
 
         //import: <STATIC_STR>;
-        private ImportStatementNode ParseImportStmt(IAstNode parent)
+        private ImportStmtNode ParseImportStmt(IAstNode parent)
         {
             //example: import: <STATIC_STR>;
-            ImportStatementNode node = new ImportStatementNode(parent);
+            ImportStmtNode node = new ImportStmtNode(parent);
 
             ParseColon();
             node.ImportValue = ParseStringLiteral(node);
@@ -197,10 +197,10 @@ namespace PolyToolkit.Parsing
             return node;
         }
         //namespace: <STATIC_STR>;
-        private NamespaceStatementNode ParseNamespaceStmt(IAstNode parent)
+        private NamespaceStmtNode ParseNamespaceStmt(IAstNode parent)
         {
             //example: namespace: <STATIC_STR>;
-            NamespaceStatementNode node = new NamespaceStatementNode(parent);
+            NamespaceStmtNode node = new NamespaceStmtNode(parent);
 
             ParseColon();
             node.NamespaceValue = ParseStringLiteral(node);
@@ -270,9 +270,9 @@ namespace PolyToolkit.Parsing
 
         #region Parse Variable
         //<TYPE> <NAME> = <EXPRESSION>; //TODO: ARRAYS DECLARATION
-        private VarDeclarationNode ParseVarDeclaration(IAstNode parent)
+        private VarDeclarationStmtNode ParseVarDeclaration(IAstNode parent)
         {
-            VarDeclarationNode node = new VarDeclarationNode(parent);
+            VarDeclarationStmtNode node = new VarDeclarationStmtNode(parent);
 
             node.VarType = ParseType(); // string/int/ etc...
             node.VarName = ParseName(); //varname
@@ -293,9 +293,9 @@ namespace PolyToolkit.Parsing
             return node;
         }
         //<NAME> = <EXPRESSION>;
-        private VarAssignNode ParseVarAssignation(IAstNode parent)
+        private VarAssignStmtNode ParseVarAssignation(IAstNode parent)
         {
-            VarAssignNode node = new VarAssignNode(parent);
+            VarAssignStmtNode node = new VarAssignStmtNode(parent);
 
             node.VarName = ParseName();
 

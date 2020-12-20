@@ -10,9 +10,9 @@ namespace PolyToolkit.Parsing.Ast
     public class ClassCtorNode : IAstNode,IWithBody
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { Args, Body }; } }
+        public List<IAstNode> Childs { get { return new List<IAstNode>() { Body }; } }
 
-        public ArgumentsNode Args { get; set; }
+        public Dictionary<string,PolyType> Args { get; set; }
         public BodyNode Body { get; }
 
         public ClassCtorNode(IAstNode parent)

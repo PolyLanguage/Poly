@@ -10,7 +10,7 @@ using PolyToolkit.Parsing;
 using PolyToolkit.Parsing.Ast;
 namespace PolyToolkit.Compilation
 {
-    public class PolyProgram
+    public sealed class PolyProgram
     {
         public string ProgramName { get; set; }
         public string DirPath { get; set; }

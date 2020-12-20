@@ -53,9 +53,9 @@ namespace PolyToolkit.Compilation.IL
                         //define class childs
                         foreach(IAstNode clChild in clNode.Body.Childs)
                         {
-                            if(clChild is VarDeclarationNode)
+                            if(clChild is VarDeclarationStmtNode)
                             {
-                                VarDeclarationNode varNode = (VarDeclarationNode)clChild;
+                                VarDeclarationStmtNode varNode = (VarDeclarationStmtNode)clChild;
 
                                 FieldBuilder fb = tb.DefineField(varNode.VarName.Value, varNode.VarType.Type.ToNativeType(),
                                     FieldAttributes.Public);

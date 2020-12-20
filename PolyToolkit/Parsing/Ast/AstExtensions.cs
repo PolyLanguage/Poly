@@ -15,7 +15,7 @@ namespace PolyToolkit.Parsing.Ast
         {
             foreach (IAstNode node in container.Body.Childs)
             {
-                if (node is NamespaceStatementNode)
+                if (node is NamespaceStmtNode)
                     return true;
             }
             return false;
@@ -48,7 +48,7 @@ namespace PolyToolkit.Parsing.Ast
                 //if:
                 //1. is variable declaration (registration)
                 //2. names is identical
-                if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == name)
+                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == name)
                     return true;
             }
             return false;
@@ -99,7 +99,7 @@ namespace PolyToolkit.Parsing.Ast
             {
                 foreach(IAstNode node in ((IWithBody)curnode).Body.Childs)
                 {
-                    if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == varname)
+                    if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == varname)
                         return true;
                 }
             }
@@ -109,7 +109,7 @@ namespace PolyToolkit.Parsing.Ast
             {
                 foreach(IAstNode node in ((IWithBody)curnode.Parent).Body.Childs)
                 {
-                    if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == varname)
+                    if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == varname)
                         return true;
                 }
             }
@@ -131,7 +131,7 @@ namespace PolyToolkit.Parsing.Ast
                 //if:
                 //1. is variable declaration (registration)
                 //2. names is identical
-                if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == name)
+                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == name)
                     return true;
                 else if (node is IAstNode && ((IAstNode)node).IsChildsContainsVariable(name))
                     return true;
@@ -151,7 +151,7 @@ namespace PolyToolkit.Parsing.Ast
                 //if:
                 //1. is variable declaration (registration)
                 //2. names is identical
-                if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == name)
+                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == name)
                     return true;
                 else if (node is IWithBody && ((IWithBody)node).IsChildsContainsVariable(name))
                     return true;
@@ -182,12 +182,12 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="container"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static VarDeclarationNode GetVar(this IWithBody container, string name)
+        public static VarDeclarationStmtNode GetVar(this IWithBody container, string name)
         {
             foreach (IAstNode node in container.Body.Childs)
             {
-                if (node is VarDeclarationNode && ((VarDeclarationNode)node).VarName.Value == name)
-                    return (VarDeclarationNode)node;
+                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName.Value == name)
+                    return (VarDeclarationStmtNode)node;
             }
             return null;
         }
@@ -229,15 +229,15 @@ namespace PolyToolkit.Parsing.Ast
         public static bool IsAllowedInNs<T>() where T : IAstNode
         {
             if (typeof(T) == typeof(ClassNode) ||
-                typeof(T) == typeof(NamespaceStatementNode) ||
-                typeof(T) == typeof(ImportStatementNode))
+                typeof(T) == typeof(NamespaceStmtNode) ||
+                typeof(T) == typeof(ImportStmtNode))
                 return true;
             else
                 return false;
         }
         public static bool IsAllowedInClass<T>()where T : IAstNode
         {
-            if (typeof(T) == typeof(VarDeclarationNode) ||
+            if (typeof(T) == typeof(VarDeclarationStmtNode) ||
                 typeof(T) == typeof(ClassCtorNode) ||
                 typeof(T) == typeof(MethodNode))
                 return true;
@@ -246,8 +246,8 @@ namespace PolyToolkit.Parsing.Ast
         }
         public static bool IsAllowedInMethod<T>()where T : IAstNode
         {
-            if (typeof(T) == typeof(VarDeclarationNode) ||
-                typeof(T) == typeof(VarAssignNode))
+            if (typeof(T) == typeof(VarDeclarationStmtNode) ||
+                typeof(T) == typeof(VarAssignStmtNode))
                 return true;
             else
                 return false;

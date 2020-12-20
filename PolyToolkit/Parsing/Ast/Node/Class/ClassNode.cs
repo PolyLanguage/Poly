@@ -12,20 +12,9 @@ namespace PolyToolkit.Parsing.Ast
     public class ClassNode : IAstNode,IWithBody
     {
         public IAstNode Parent { get; set; }
+        public List<IAstNode> Childs { get { return new List<IAstNode>() { Body }; } }
 
-        public NameNode Name { get; set; }
-        //name & body
-        public List<IAstNode> Childs
-        {
-            get
-            {
-                List<IAstNode> res = new List<IAstNode>();
-                res.Add(Name);
-                res.Add(Body);
-                return res;
-            }
-        }
-        //methods,vars
+        public string ClassName { get; set; }
         public BodyNode Body { get; }
 
         public ClassNode(IAstNode parent)
