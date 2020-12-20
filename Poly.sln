@@ -19,15 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkit", "PolyToolkit\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{B756475D-0F39-446B-BB71-273187136CDC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kaleidoscope", "C:\Users\serge\Downloads\LLVMSharp-master\samples\KaleidoscopeTutorial\Chapter5\Kaleidoscope\Kaleidoscope.csproj", "{CD23CB2E-951B-4FAD-A4CD-4048731DBA31}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaleidoscopeLLVM", "C:\Users\serge\Downloads\LLVMSharp-master\samples\KaleidoscopeTutorial\Chapter5\KaleidoscopeLLVM\KaleidoscopeLLVM.csproj", "{C1147A13-4174-410A-A891-335D858703B7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkit.Compilation.LIR", "PolyToolkit.Compilation.LIR\PolyToolkit.Compilation.LIR.csproj", "{83CFB1B3-D439-400D-9691-FB5C2DF8DFCA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyEditor", "PolyEditor\PolyEditor.csproj", "{31D3694C-6326-43CE-B2A3-91426635868D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProximaEngine", "..\ProximaEngine\ProximaEngine\ProximaEngine.csproj", "{58846BF6-AB25-4E91-91FE-BFE62C28626B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyToolkitX", "PolyToolkitX\PolyToolkitX.csproj", "{67073059-3528-42E1-93B3-155526893594}"
 EndProject
