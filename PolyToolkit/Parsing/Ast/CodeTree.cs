@@ -34,12 +34,12 @@ namespace PolyToolkit.Parsing.Ast
         private void PrintNode(IAstNode node,int lvl)
         {
             //add spaces from lvl
-            string lvlstr = "";
+            StringBuilder lvlstr = new StringBuilder("");
             if (lvl != 0)
                 for (int ls = 0; ls <= lvl; ls++)
-                    lvlstr += "|  ";
+                    lvlstr.Append("|  ");
 
-            lvlstr += "-";
+            lvlstr.Append("-");
 
             //content
             string content = "";
@@ -57,7 +57,7 @@ namespace PolyToolkit.Parsing.Ast
             //print current node
             if (node != null)
             {
-                Console.WriteLine(lvlstr + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
+                Console.WriteLine(lvlstr.ToString() + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
                 //print childs
                 foreach (IAstNode child in node.Childs)
                     PrintNode(child, lvl + 1);
