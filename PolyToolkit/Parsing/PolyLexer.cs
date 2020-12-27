@@ -60,7 +60,7 @@ namespace PolyToolkit.Parsing
             else if (ch == '\n')
                 return new PolyToken("\n", PolyTokenType.NewLine); // \n
 
-            else if (ch == '"' || ch == "'".ToCharArray().First())
+            else if (ch == '"' || ch == '\'') 
                 return this.NextString(ch); //string "a" or 'b'
 
             else if (IsOperator(ch))
