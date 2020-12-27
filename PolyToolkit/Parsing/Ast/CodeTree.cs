@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace PolyToolkit.Parsing.Ast
 {
@@ -39,16 +40,10 @@ namespace PolyToolkit.Parsing.Ast
         private void PrintAstNode(IAstNode node, int lvl)
         {
             //add spaces from lvl
-<<<<<<< HEAD
-            string lvlstr = "";
-            for (int ls = 0; ls <= lvl; ls++)
-                lvlstr += "|  ";
-=======
             StringBuilder lvlstr = new StringBuilder("");
             if (lvl != 0)
                 for (int ls = 0; ls <= lvl; ls++)
                     lvlstr.Append("|  ");
->>>>>>> 6b76ba0d20dff659a4c203d3675b84fef9a7a21c
 
             lvlstr.Append("-");
 
@@ -73,17 +68,10 @@ namespace PolyToolkit.Parsing.Ast
             //print current node
             if (node != null)
             {
-<<<<<<< HEAD
-                Console.WriteLine(lvlstr + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
-                //print childs
-                foreach (IAstNode child in node.Childs)
-                    PrintAstNode(child, lvl + 1);
-=======
                 Console.WriteLine(lvlstr.ToString() + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
                 //print childs
                 foreach (IAstNode child in node.Childs)
-                    PrintNode(child, lvl + 1);
->>>>>>> 6b76ba0d20dff659a4c203d3675b84fef9a7a21c
+                    PrintAstNode(child, lvl + 1);
             }
         }
 

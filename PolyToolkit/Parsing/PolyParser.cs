@@ -358,7 +358,11 @@ namespace PolyToolkit.Parsing
         {
             MethodNode methnode = new MethodNode(parent);
             //identification
-            methnode.MethodReturnType = ParseType();
+            PolyToken next = NextToken();
+            if (PolyType.FromName(next.Value) != PolyType.UnknownType)
+                methnode.MethodReturnType = PolyType.FromName(next.Value);
+            else
+                PushToken(next);
             methnode.MethodName = ParseName();
             methnode.MethodArgs = ParseArgs(methnode);
             //body
@@ -927,7 +931,7 @@ namespace PolyToolkit.Parsing
                 StepSuccess();
             }
             //return typename
-            return PolyType.FromVarName(token.Value);
+            return PolyType.FromName(token.Value);
         }
         /// <summary>
         /// Parse index node

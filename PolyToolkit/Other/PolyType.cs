@@ -14,9 +14,18 @@ namespace PolyToolkit
         public static PolyType RealType = new PolyType("real", false);
         public static PolyType BooleanType = new PolyType("bool", false);
         public static PolyType ObjectType = new PolyType("object", true);
+
+        /// <summary>
+        /// None type, used by methods that not returns anything
+        /// </summary>
+        public static PolyType NoneType = new PolyType("none", false);
+        /// <summary>
+        /// Unknown type, used when type is unknown or failed in conversation
+        /// </summary>
         public static PolyType UnknownType = new PolyType("unknown", true);
 
         public static Dictionary<string, PolyType> SystemTypes = new Dictionary<string, PolyType>();
+
         //default literals
         public static string NullLiteral = "null";
         public static string TrueLiteral = "true";
@@ -46,8 +55,12 @@ namespace PolyToolkit
             CanBeNull = canBeNull;
         }
 
-        //helpful static methods
-        public static PolyType FromVarName(string name)
+        /// <summary>
+        /// Converts type name from string to type
+        /// </summary>
+        /// <param name="name">type name</param>
+        /// <returns></returns>
+        public static PolyType FromName(string name)
         {
             switch(name)
             {
@@ -64,10 +77,15 @@ namespace PolyToolkit
                 case "object":
                     return ObjectType;
                 default:
-                    return new PolyType(name,true);
+                    return PolyType.UnknownType;
             }
         }
-        public static PolyType IdentifyValue(object value)
+        /// <summary>
+        /// Identifies type from native value (string/int/etc)
+        /// </summary>
+        /// <param name="value">native value</param>
+        /// <returns></returns>
+        public static PolyType FromNativeValue(object value)
         {
             if (value is string)
                 return StringType;
@@ -80,20 +98,7 @@ namespace PolyToolkit
             else if (value == null)
                 return ObjectType;
             else
-                return new PolyType(value.GetType().FullName,true);
-        }
-        public static PolyType IdentifyLiteralType(object literalValue)
-        {
-            switch (literalValue)
-            {
-                case true:
-                case false:
-                    return BooleanType;
-                case null:
-                    return ObjectType;
-                default:
-                    return null;
-            }
+                return PolyType.UnknownType;
         }
         
         public static bool IsItLiteral(string value)
