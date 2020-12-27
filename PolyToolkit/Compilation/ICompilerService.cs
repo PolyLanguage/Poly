@@ -12,6 +12,6 @@ namespace PolyToolkit.Compilation
         void CompileSingleFile(PolyCodefile file);
 
         string GenerateCode(PolyProgram program);
-        string GenerateByteCode(PolyProgram program);
+        byte[] GenerateByteCode(PolyProgram program);
     }
 }

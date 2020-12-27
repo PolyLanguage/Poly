@@ -9,11 +9,12 @@ namespace PolyToolkit
     public class PolyType
     {
         //default types
-        public static PolyType StringType = new PolyType("string",true);
-        public static PolyType IntType = new PolyType("int",false);
-        public static PolyType RealType = new PolyType("real",false);
-        public static PolyType BooleanType = new PolyType("bool",false);
-        public static PolyType ObjectType = new PolyType("object",true);
+        public static PolyType StringType = new PolyType("string", true);
+        public static PolyType IntType = new PolyType("int", false);
+        public static PolyType RealType = new PolyType("real", false);
+        public static PolyType BooleanType = new PolyType("bool", false);
+        public static PolyType ObjectType = new PolyType("object", true);
+        public static PolyType UnknownType = new PolyType("unknown", true);
 
         public static Dictionary<string, PolyType> SystemTypes = new Dictionary<string, PolyType>();
         //default literals
@@ -42,6 +43,7 @@ namespace PolyToolkit
         public PolyType(string name,bool canBeNull)
         {
             Name = name;
+            CanBeNull = canBeNull;
         }
 
         //helpful static methods
@@ -157,10 +159,16 @@ namespace PolyToolkit
 
         public static bool operator ==(PolyType a, PolyType b)
         {
+            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null))
+                return false;
+
             return a.Name == b.Name;
         }
         public static bool operator !=(PolyType a, PolyType b)
         {
+            if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null))
+                return true;
+
             return a.Name != b.Name;
         }
     }

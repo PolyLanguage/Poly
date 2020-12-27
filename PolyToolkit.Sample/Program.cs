@@ -53,8 +53,10 @@ namespace PolyToolkit.Sample
 
             if (log.Length == 0)
             {
-                Console.WriteLine("[Program Tree]");
-                program.Files[0].CodeTree.Print();
+                Console.WriteLine("[AST Tree]");
+                program.Files[0].CodeTree.PrintAst();
+                Console.WriteLine("[Scope Tree]");
+                program.Files[0].CodeTree.PrintScope();
             }
             Console.ReadLine();
 

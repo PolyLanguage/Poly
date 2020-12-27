@@ -4,12 +4,9 @@ namespace PolyToolkit.Parsing.Ast
 {
     public class SubtractExpressionNode : ArithmeticExpressionNode
     {
-        public override IExpressionNode Left { get; protected set; }
-        public override IExpressionNode Right { get; protected set; }
-
-        public SubtractExpressionNode(IAstNode parent,IExpressionNode left,IExpressionNode right)
-            : base (parent, left, right)
-        {}
+        public SubtractExpressionNode(IAstNode parent)
+            : base (parent)
+        { }
 
         /*public override object Apply(object leftvalue, object rightvalue)
         {

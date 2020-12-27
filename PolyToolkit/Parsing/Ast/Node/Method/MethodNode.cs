@@ -9,21 +9,19 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: void Main(string args) {}
     /// </summary>
-    public class MethodNode : IAstNode,IWithBody
+    public class MethodNode : IAstNode, IWithBody
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { Body }; } }
+        public List<IAstNode> Childs { get; set; }
 
         public PolyType MethodReturnType { get; set; }
         public string MethodName { get; set; }
         public Dictionary<string,PolyType> MethodArgs { get; set; }
-        public BodyNode Body { get; }
 
         public MethodNode(IAstNode parent)
         {
-            Body = new BodyNode(this, new List<IAstNode>());
-
             Parent = parent;
+            Childs = new List<IAstNode>();
         }
 
         public bool IsAllowed<T>() where T : IAstNode
@@ -31,7 +29,7 @@ namespace PolyToolkit.Parsing.Ast
             if (AstExtensions.IsAllowedInMethod<T>())
                 return true;
             else
-                return true;
+                return false;
         }
     }
 }

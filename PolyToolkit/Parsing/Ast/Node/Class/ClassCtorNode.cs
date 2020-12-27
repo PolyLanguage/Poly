@@ -10,23 +10,22 @@ namespace PolyToolkit.Parsing.Ast
     public class ClassCtorNode : IAstNode,IWithBody
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { Body }; } }
+        public List<IAstNode> Childs { get; set; }
 
-        public Dictionary<string,PolyType> Args { get; set; }
-        public BodyNode Body { get; }
+        public Dictionary<string,PolyType> CtorArgs { get; set; }
 
         public ClassCtorNode(IAstNode parent)
         {
             Parent = parent;
-            Body = new BodyNode(this, new List<IAstNode>());
+            Childs = new List<IAstNode>();
         }
 
-        public bool IsAllowed<T>()where T : IAstNode
+        public bool IsAllowed<T>() where T : IAstNode
         {
             if (AstExtensions.IsAllowedInMethod<T>())
                 return true;
             else
-                return true;
+                return false;
         }
     }
 }

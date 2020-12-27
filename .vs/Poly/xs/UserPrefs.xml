@@ -1,9 +1,9 @@
 ﻿<Properties StartupConfiguration="{F8FDBC56-E420-460C-9923-28EFBFEF988A}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit/Parsing/Ast/Node/Expression/BinaryExpressionNode.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit/Parsing/PolyLexer.cs">
     <Files>
-      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/Operation/MultiplyExpressionNode.cs" Line="26" Column="24" />
-      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/ArithmeticExpressionNode.cs" Line="20" Column="9" />
-      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/BinaryExpressionNode.cs" Line="1" Column="1" />
+      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="191" Column="24" />
+      <File FileName="PolyToolkit/Parsing/Ast/AstExtensions.cs" Line="141" Column="51" />
+      <File FileName="PolyToolkit/Parsing/PolyLexer.cs" Line="92" Column="41" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -15,28 +15,31 @@
             <Node name="Toolkit" expanded="True">
               <Node name="First Gen" expanded="True">
                 <Node name="PolyToolkit" expanded="True">
-                  <Node name="Evaluation" expanded="True">
-                    <Node name="Expression" expanded="True">
-                      <Node name="Actions" expanded="True" />
-                    </Node>
-                  </Node>
+                  <Node name="Compilation" expanded="True" />
+                  <Node name="Other" expanded="True" />
                   <Node name="Parsing" expanded="True">
                     <Node name="Ast" expanded="True">
                       <Node name="Node" expanded="True">
                         <Node name="Expression" expanded="True">
-                          <Node name="Operation" expanded="True">
-                            <Node name="Boolean" expanded="True" />
-                          </Node>
-                          <Node name="BinaryExpressionNode.cs" selected="True" />
+                          <Node name="Operation" expanded="True" />
                         </Node>
+                        <Node name="Method" expanded="True" />
+                      </Node>
+                      <Node name="Statement" expanded="True">
+                        <Node name="Variable" expanded="True" />
                       </Node>
                     </Node>
+                    <Node name="PolyLexer.cs" selected="True" />
                   </Node>
                 </Node>
+                <Node name="PolyToolkit.Compilation.IL" expanded="True" />
               </Node>
             </Node>
           </Node>
         </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

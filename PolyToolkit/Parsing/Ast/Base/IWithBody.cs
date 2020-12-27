@@ -9,7 +9,6 @@ namespace PolyToolkit.Parsing.Ast
 {
     public interface IWithBody : IAstNode
     {
-        BodyNode Body { get; }
         bool IsAllowed<T>() where T : IAstNode;
     }
 }

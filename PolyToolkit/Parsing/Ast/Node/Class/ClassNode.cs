@@ -9,18 +9,17 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Can contain only variable & method declarations
     /// </summary>
-    public class ClassNode : IAstNode,IWithBody
+    public class ClassNode : IAstNode, IWithBody
     {
         public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { Body }; } }
+        public List<IAstNode> Childs { get; set; }
 
         public string ClassName { get; set; }
-        public BodyNode Body { get; }
 
         public ClassNode(IAstNode parent)
         {
-            Body = new BodyNode(this, new List<IAstNode>());
             Parent = parent;
+            Childs = new List<IAstNode>();
         }
 
         public bool IsAllowed<T>() where T : IAstNode
@@ -28,7 +27,7 @@ namespace PolyToolkit.Parsing.Ast
             if (AstExtensions.IsAllowedInClass<T>())
                 return true;
             else
-                return true;
+                return false;
         }
     }
 }

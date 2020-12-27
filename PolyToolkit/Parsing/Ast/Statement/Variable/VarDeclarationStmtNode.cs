@@ -29,7 +29,10 @@ namespace PolyToolkit.Parsing.Ast
         /// <returns></returns>
         public bool IsTypesValid()
         {
-            return VarType == VarValue.Type;
+            if (VarValue != null)
+                return VarType == VarValue.Type;
+            else
+                return false;
         }
     }
 }

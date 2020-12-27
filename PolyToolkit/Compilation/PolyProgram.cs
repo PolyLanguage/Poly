@@ -35,7 +35,7 @@ namespace PolyToolkit.Compilation
             T compiler = new T();
             return compiler.GenerateCode(this);
         }
-        public string GenerateByteCode<T>() where T : ICompilerService, new()
+        public byte[] GenerateByteCode<T>() where T : ICompilerService, new()
         {
             T compiler = new T();
             return compiler.GenerateByteCode(this);

@@ -19,5 +19,17 @@ namespace PolyToolkit.Parsing.Ast
         {
             Parent = parent;
         }
+
+        /// <summary>
+        /// Check if declaration type equals value type
+        /// </summary>
+        /// <returns></returns>
+        public bool IsTypesValid()
+        {
+            if (VarValue != null)
+                return Parent.GetVar(VarName) == VarValue.Type;
+            else
+                return false;
+        }
     }
 }

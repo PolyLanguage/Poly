@@ -4,11 +4,8 @@ namespace PolyToolkit.Parsing.Ast
 {
     public class MultiplyExpressionNode : ArithmeticExpressionNode
     {
-        public override IExpressionNode Left { get; protected set; }
-        public override IExpressionNode Right { get; protected set; }
-
-        public MultiplyExpressionNode(IAstNode parent, IExpressionNode left, IExpressionNode right)
-            : base(parent, left, right)
+        public MultiplyExpressionNode(IAstNode parent)
+            : base(parent)
         { }
 
         /*public override object Apply(object leftvalue, object rightvalue)

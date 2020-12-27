@@ -4,23 +4,31 @@ namespace PolyToolkit.Parsing.Ast
 {
     public abstract class ArithmeticExpressionNode : BinaryExpressionNode
     {
-        public ArithmeticExpressionNode(IAstNode parent, IExpressionNode left, IExpressionNode right)
-            : base(parent, left, right)
+        public ArithmeticExpressionNode(IAstNode parent)
+            : base(parent)
+        { }
+
+        public override void ApplyType()
         {
-            //int
-            if (left.Type == PolyType.IntType && right.Type == PolyType.IntType)
-                this.Type = PolyType.IntType;
-            //real
-            else if ((left.Type == PolyType.IntType && right.Type == PolyType.RealType) ||
-                (left.Type == PolyType.RealType && right.Type == PolyType.IntType) ||
-                (left.Type == PolyType.RealType && right.Type == PolyType.RealType))
-                this.Type = PolyType.RealType;
-            //string
-            else if (left.Type == PolyType.StringType || right.Type == PolyType.StringType)
-                this.Type = PolyType.StringType;
-            //else
-            else
-                this.Type = PolyType.ObjectType;
+            base.ApplyType();
+
+            if (Left != null && Right != null)
+            {
+                //int
+                if (Left.Type == Right.Type)
+                    this.Type = Left.Type;
+                //real
+                else if ((Left.Type == PolyType.IntType && Right.Type == PolyType.RealType) ||
+                    (Left.Type == PolyType.RealType && Right.Type == PolyType.IntType) ||
+                    (Left.Type == PolyType.RealType && Right.Type == PolyType.RealType))
+                    this.Type = PolyType.RealType;
+                //object
+                else if (Left.Type == PolyType.ObjectType || Right.Type == PolyType.ObjectType)
+                    this.Type = PolyType.ObjectType;
+                //else
+                else
+                    this.Type = PolyType.UnknownType;
+            }
         }
     }
 }
