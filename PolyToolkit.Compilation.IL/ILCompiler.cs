@@ -48,26 +48,34 @@ namespace PolyToolkit.Compilation.IL
                         ClassNode clNode = (ClassNode)node;
 
                         //define class
-                        TypeBuilder tb = md.DefineType(clNode.Name.Value,
+                        TypeBuilder tb = md.DefineType(clNode.ClassName,
                             TypeAttributes.Public);
                         //define class childs
-                        foreach(IAstNode clChild in clNode.Body.Childs)
+                        foreach(IAstNode clChild in clNode.Childs)
                         {
                             if(clChild is VarDeclarationStmtNode)
                             {
                                 VarDeclarationStmtNode varNode = (VarDeclarationStmtNode)clChild;
 
-                                FieldBuilder fb = tb.DefineField(varNode.VarName.Value, varNode.VarType.Type.ToNativeType(),
+                                tb.DefineField(varNode.VarName, varNode.VarType.ToNativeType(),
                                     FieldAttributes.Public);
-                                
                             }
-                            if(clChild is MethodNode)
+                            else if(clChild is MethodNode)
                             {
                                 MethodNode methNode = (MethodNode)clChild;
 
-                                MethodBuilder mb = tb.DefineMethod(methNode.MethodName.Value,
-                                    MethodAttributes.Public);
-                                
+                                MethodBuilder mb = tb.DefineMethod(methNode.MethodName,
+                                    MethodAttributes.Public, methNode.MethodReturnType.ToNativeType(),methNode.MethodArgs.Values.ToList().ToNativeArray());
+
+                                ILGenerator gen = mb.GetILGenerator();
+                                foreach(IAstNode methChild in methNode.Childs)
+                                {
+                                    if (methChild is VarDeclarationStmtNode)
+                                    {
+                                        VarDeclarationStmtNode varNode = (VarDeclarationStmtNode)methChild;
+                                        DefineLocalVariable(gen, varNode.VarType, varNode.VarValue);
+                                    }
+                                }
                             }
                         }
 
@@ -94,5 +102,18 @@ namespace PolyToolkit.Compilation.IL
         {
             throw new NotImplementedException();
         }
+
+        #region IL Generation
+        private void DefineLocalVariable(ILGenerator gen,PolyType type,IExpressionNode value)
+        {
+            LocalBuilder varbuilder = gen.DeclareLocal(type.ToNativeType());
+            EmitValue(varbuilder, value);
+        }
+
+        private void EmitValue(LocalBuilder gen,IExpressionNode value)
+        {
+
+        }
+        #endregion
     }
 }

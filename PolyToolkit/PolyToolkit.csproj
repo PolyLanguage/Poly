@@ -17,5 +17,6 @@
     <Folder Include="Parsing\Ast\Node\Expression\Operation\" />
     <Folder Include="Parsing\Ast\Node\Expression\Operation\Boolean\" />
     <Folder Include="Parsing\Ast\Statement\Variable\" />
+    <Folder Include="Parsing\Ast\Node\Condition\" />
   </ItemGroup>
 </Project>

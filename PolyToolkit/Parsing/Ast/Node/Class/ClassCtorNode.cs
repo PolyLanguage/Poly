@@ -22,7 +22,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public bool IsAllowed<T>() where T : IAstNode
         {
-            if (AstExtensions.IsAllowedInMethod<T>())
+            if (AstExtensions.IsAllowedInMethod<T>() && typeof(T) != typeof(ReturnStmtNode))
                 return true;
             else
                 return false;

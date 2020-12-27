@@ -14,7 +14,7 @@ namespace PolyToolkit.Parsing.Ast
         /// <typeparam name="T"></typeparam>
         /// <param name="container"></param>
         /// <returns></returns>
-        public static bool IsContainsNode<T>(this IAstNode container) where T: IAstNode
+        public static bool IsContainsNodeIn<T>(this IAstNode container) where T: IAstNode
         {
             foreach (IAstNode node in container.Childs)
             {
@@ -29,26 +29,11 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="container"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static bool IsContainsClass(this CodeTree container, string name)
+        public static bool IsContainsClassIn(this CodeTree container, string name)
         {
             foreach (IAstNode node in container.Childs)
             {
                 if (node is ClassNode && ((ClassNode)node).ClassName == name)
-                    return true;
-            }
-            return false;
-        }
-        /// <summary>
-        /// Check if node got variable inside (not inside of childs)
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsContainsVariable(this IWithBody container, string name)
-        {
-            foreach (IAstNode node in container.Childs)
-            {
-                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == name)
                     return true;
             }
             return false;
@@ -60,7 +45,7 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="name"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static bool IsContainsMethod(this ClassNode container, string name, List<PolyType> args)
+        public static bool IsContainsMethodIn(this ClassNode container, string name, List<PolyType> args)
         {
             foreach (IAstNode node in container.Childs)
             {
@@ -81,9 +66,9 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="name"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static bool IsContainsMethod(this ClassNode container, string name, PolyType[] args)
+        public static bool IsContainsMethodIn(this ClassNode container, string name, PolyType[] args)
         {
-            return container.IsContainsMethod(name, args.ToList());
+            return container.IsContainsMethodIn(name, args.ToList());
         }
         /// <summary>
         /// Checks if class got ctor inside (not inside of childs)
@@ -91,7 +76,7 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="container"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static bool IsContainsCtor(this ClassNode container, List<PolyType> args)
+        public static bool IsContainsCtorIn(this ClassNode container, List<PolyType> args)
         {
             foreach (IAstNode node in container.Childs)
             {
@@ -109,9 +94,9 @@ namespace PolyToolkit.Parsing.Ast
         /// <param name="container"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static bool IsContainsCtor(this ClassNode container, PolyType[] args)
+        public static bool IsContainsCtorIn(this ClassNode container, PolyType[] args)
         {
-            return container.IsContainsCtor(args.ToList());
+            return container.IsContainsCtorIn(args.ToList());
         }
         #endregion
 
@@ -147,12 +132,30 @@ namespace PolyToolkit.Parsing.Ast
 
         #region Get
         /// <summary>
+        /// Get first parent of node
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static T GetFirstParent<T>(this IAstNode node) where T : IAstNode
+        {
+            if (node.Parent != null)
+            {
+                if (node.Parent is T)
+                    return (T)node.Parent;
+                else
+                    return node.Parent.GetFirstParent<T>();
+            }
+            else
+                return default(T);
+        }
+        /// <summary>
         /// Find class inside tree
         /// </summary>
         /// <param name="container"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static ClassNode GetClass(this CodeTree container, string name)
+        public static ClassNode GetClassIn(this CodeTree container, string name)
         {
             foreach (IAstNode node in container.Childs)
             {
@@ -162,12 +165,12 @@ namespace PolyToolkit.Parsing.Ast
             return null;
         }
         /// <summary>
-        /// Find variable inside
+        /// Find variable in scope
         /// </summary>
         /// <param name="container"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static PolyType GetVar(this IAstNode container, string name)
+        public static PolyType GetFirstParentVar(this IAstNode container, string name)
         {
             //check in args (if method or ctor)
             if (container is MethodNode)
@@ -208,10 +211,10 @@ namespace PolyToolkit.Parsing.Ast
             //in parent container
             if(container.Parent != null && container.Parent is CodeTree == false)
             {
-                return container.Parent.GetVar(name);
+                return container.Parent.GetFirstParentVar(name);
             }
 
-            return null;
+            return PolyType.UnknownType;
         }
         /// <summary>
         /// Find method inside
@@ -269,6 +272,26 @@ namespace PolyToolkit.Parsing.Ast
         #endregion
 
         #region Other
+        /// <summary>
+        /// Check if not all code paths is returns value
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static bool IsAllCodePathsReturns(this IWithBody container)
+        {
+            //in current container
+            bool current = false;
+            foreach(IAstNode node in container.Childs)
+            {
+                //current returns if has ReturnStatement or has Else node
+                if (node is ReturnStmtNode || node is ElseNode)
+                    current = true;
+
+                if (node is IWithBody && !((IWithBody)node).IsAllCodePathsReturns())
+                    return false;
+            }
+            return current;
+        }
         /// <summary>
         /// Checks if variable available in available scopes
         /// </summary>

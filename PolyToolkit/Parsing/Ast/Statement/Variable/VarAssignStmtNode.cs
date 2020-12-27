@@ -27,7 +27,7 @@ namespace PolyToolkit.Parsing.Ast
         public bool IsTypesValid()
         {
             if (VarValue != null)
-                return Parent.GetVar(VarName) == VarValue.Type;
+                return Parent.GetFirstParentVar(VarName) == VarValue.Type;
             else
                 return false;
         }

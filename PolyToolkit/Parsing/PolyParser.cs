@@ -60,7 +60,7 @@ namespace PolyToolkit.Parsing
                         CurrentTree.Childs.Add(node);
                     else
                     {
-                        if (CurrentTree.IsContainsNode<NamespaceStmtNode>() == false)
+                        if (CurrentTree.IsContainsNodeIn<NamespaceStmtNode>() == false)
                             CurrentTree.Childs.Add(node);
                         else
                             Log.Add(new ParserError("Unexpected namespace statement", CurrentLine,
@@ -70,7 +70,7 @@ namespace PolyToolkit.Parsing
             }
 
             //if not contains namespace definition
-            if (!CurrentTree.IsContainsNode<NamespaceStmtNode>())
+            if (!CurrentTree.IsContainsNodeIn<NamespaceStmtNode>())
                 Log.Add(new ParserError("Undefined namespace", 1, ThrowedIn.CodeTreeParse));
 
             if (Log.Errors.Count == 0 && Lexer.Log.Errors.Count == 0)
@@ -236,6 +236,14 @@ namespace PolyToolkit.Parsing
             node.ReturnValue = ParseBinaryExpression(0, node);
             ParseStatementEnd();
 
+            //if method returns none
+            MethodNode meth = node.GetFirstParent<MethodNode>();
+            if (meth.MethodReturnType == PolyType.NoneType)
+                Log.Add(new ParserError("This method cannot return anything ",
+                    CurrentLine, ThrowedIn.SpecifiedNodeParse));
+            else if(meth.MethodReturnType != node.ReturnValue.Type)
+                Log.Add(new ParserError("This method should return '"+meth.MethodReturnType.Name+"' value",
+                    CurrentLine, ThrowedIn.SpecifiedNodeParse));
             return node;
         }
         #endregion
@@ -312,7 +320,7 @@ namespace PolyToolkit.Parsing
             ParseStatementEnd(); // ;
 
             //check if failed parsing value
-            if(node.VarValue == null || node.VarValue.Type is null)
+            if(node.VarValue == null)
                 Log.Add(new ParserError("Variable value is unknown",
                     CurrentLine, ThrowedIn.SpecifiedNodeParse));
             //check types for mismatch
@@ -339,12 +347,12 @@ namespace PolyToolkit.Parsing
             ParseStatementEnd();
 
             //check if failed parsing value
-            if (node.VarValue == null || node.VarValue.Type is null)
+            if (node.VarValue == null)
                 Log.Add(new ParserError("Variable value is unknown",
                     CurrentLine, ThrowedIn.SpecifiedNodeParse));
             //check types for mismatch
             else if (!node.IsTypesValid())
-                Log.Add(new ParserError("Type mismatch (" + parent.GetVar(node.VarName).Name + " & " + node.VarValue.Type.Name + ")",
+                Log.Add(new ParserError("Type mismatch (" + parent.GetFirstParentVar(node.VarName).Name + " & " + node.VarValue.Type.Name + ")",
                     CurrentLine, ThrowedIn.SpecifiedNodeParse));
 
             return node;
@@ -362,7 +370,11 @@ namespace PolyToolkit.Parsing
             if (PolyType.FromName(next.Value) != PolyType.UnknownType)
                 methnode.MethodReturnType = PolyType.FromName(next.Value);
             else
+            {
+                methnode.MethodReturnType = PolyType.NoneType;
                 PushToken(next);
+            }
+            int methodDeclLine = CurrentLine;
             methnode.MethodName = ParseName();
             methnode.MethodArgs = ParseArgs(methnode);
             //body
@@ -382,7 +394,10 @@ namespace PolyToolkit.Parsing
 
             ParseCodeblockEnd(); // }
 
-            //TODO: check if return type exists (if required) AND check if return value not equals required return type
+            //if not returns
+            if(methnode.MethodReturnType != PolyType.NoneType && !methnode.IsAllCodePathsReturns())
+                Log.Add(new ParserError("Not all code paths returns",
+                    methodDeclLine, ThrowedIn.SpecifiedNodeParse));
 
             return methnode;
         }
@@ -763,7 +778,7 @@ namespace PolyToolkit.Parsing
             {
                 if (parent.IsVariableAvailable(token.Value))
                 {
-                    return new VarNameNode(parent, token.Value, parent.GetVar(token.Value));
+                    return new VarNameNode(parent, token.Value, parent.GetFirstParentVar(token.Value));
 
                     //TODO: method call val
                 }

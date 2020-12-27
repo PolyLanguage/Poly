@@ -17,5 +17,12 @@ namespace PolyToolkit
                 res.Add(((IAstNode)el));
             return res;
         }
+        public static Type[] ToNativeArray(this List<PolyType> list)
+        {
+            List<Type> res = new List<Type>();
+            foreach (PolyType type in list)
+                res.Add(type.ToNativeType());
+            return res.ToArray();
+        }
     }
 }

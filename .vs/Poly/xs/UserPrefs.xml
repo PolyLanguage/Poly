@@ -1,21 +1,27 @@
 ﻿<Properties StartupConfiguration="{F8FDBC56-E420-460C-9923-28EFBFEF988A}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit/Parsing/PolyParser.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit.Interpreter/PolyInterpreter.cs">
     <Files>
-      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="934" Column="37" />
-      <File FileName="PolyToolkit/Parsing/Ast/AstExtensions.cs" Line="141" Column="51" />
+      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="398" Column="67" />
+      <File FileName="PolyToolkit/Parsing/Ast/AstExtensions.cs" Line="217" Column="40" />
       <File FileName="PolyToolkit/Other/PolyType.cs" Line="102" Column="10" />
+      <File FileName="PolyToolkit.Interpreter/PolyInterpreter.cs" Line="23" Column="48" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="Poly" expanded="True">
+            <Node name="Samples" expanded="True">
+              <Node name="PolyToolkit.Sample" expanded="True" />
+            </Node>
             <Node name="Toolkit" expanded="True">
               <Node name="First Gen" expanded="True">
-                <Node name="PolyToolkit" expanded="True" selected="True">
-                  <Node name="Other" expanded="True" />
+                <Node name="PolyToolkit" expanded="True">
                   <Node name="Parsing" expanded="True">
                     <Node name="Ast" expanded="True" />
                   </Node>
+                </Node>
+                <Node name="PolyToolkit.Interpreter" expanded="True">
+                  <Node name="PolyInterpreter.cs" selected="True" />
                 </Node>
               </Node>
             </Node>
@@ -28,6 +34,7 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Toolkit.First_220Gen.PolyToolkit.Interpreter FirstBuild="True" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.ItemProperties.Samples.PolyToolkit.Sample PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
