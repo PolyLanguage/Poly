@@ -37,6 +37,7 @@ namespace PolyToolkit.Sample
             string srcpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "polysrc";
             Console.WriteLine("Constructing code tree...");
 
+            //parsing
             PolyProgram program = new PolyProgram("TestProgram",srcpath);
             program.AddFilesFromDir(srcpath);
             program.ReadAllFiles();
@@ -46,11 +47,13 @@ namespace PolyToolkit.Sample
             timer.Stop();
             Console.WriteLine("[Parsed: " + timer.ElapsedMilliseconds + "ms]");
 
+            //errors logging
             Console.ForegroundColor = ConsoleColor.DarkRed;
             foreach (string logMsg in log)
                 Console.WriteLine(logMsg);
             Console.ForegroundColor = ConsoleColor.Gray;
 
+            //printing
             if (log.Length == 0)
             {
                 Console.WriteLine("[AST Tree]");
@@ -58,9 +61,8 @@ namespace PolyToolkit.Sample
                 Console.WriteLine("[Scope Tree]");
                 program.Files[0].CodeTree.PrintScope();
             }
-            Console.ReadLine();
 
-            //so i think its all (maybe :/)
+            Console.ReadLine();
         }
     }
 }

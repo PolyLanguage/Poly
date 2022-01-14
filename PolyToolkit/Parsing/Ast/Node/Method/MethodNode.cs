@@ -7,24 +7,22 @@ using System.Threading.Tasks;
 namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
-    /// Example: void Main(string args) {}
+    /// Example: method Main() { }
     /// </summary>
-    public class MethodNode : IAstNode, IWithBody
+    public sealed class MethodNode : BlockNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get; set; }
+        public override List<AstNode> Childs { get; set; }
 
         public PolyType MethodReturnType { get; set; }
         public string MethodName { get; set; }
         public Dictionary<string,PolyType> MethodArgs { get; set; }
 
-        public MethodNode(IAstNode parent)
+        public MethodNode(AstNode parent, int line) : base(parent, line)
         {
-            Parent = parent;
-            Childs = new List<IAstNode>();
+            Childs = new List<AstNode>();
         }
 
-        public bool IsAllowed<T>() where T : IAstNode
+        public override bool IsAllowed<T>()
         {
             if (AstExtensions.IsAllowedInMethod<T>())
                 return true;

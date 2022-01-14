@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace PolyToolkit.Parsing.Ast
 {
-    // classname(<ARGS>) { <BODY> }
-    public class ClassCtorNode : IAstNode,IWithBody
+    /// <summary>
+    /// Example: ctor(string name) { }
+    /// </summary>
+    public sealed class ClassCtorNode : BlockNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get; set; }
+        public override List<AstNode> Childs { get; set; }
 
         public Dictionary<string,PolyType> CtorArgs { get; set; }
 
-        public ClassCtorNode(IAstNode parent)
+        public ClassCtorNode(AstNode parent, int line) : base(parent, line)
         {
-            Parent = parent;
-            Childs = new List<IAstNode>();
+            Childs = new List<AstNode>();
         }
 
-        public bool IsAllowed<T>() where T : IAstNode
+        public override bool IsAllowed<T>()
         {
             if (AstExtensions.IsAllowedInMethod<T>() && typeof(T) != typeof(ReturnStmtNode))
                 return true;

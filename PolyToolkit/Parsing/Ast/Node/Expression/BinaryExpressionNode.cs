@@ -3,28 +3,22 @@ using System.Collections.Generic;
 
 namespace PolyToolkit.Parsing.Ast
 {
-    public abstract class BinaryExpressionNode : IExpressionNode
+    public abstract class BinaryExpressionNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { Left, Right }; } }
+        public override List<AstNode> Childs { get => new List<AstNode>() { Left,Right }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
 
         /// <summary>
         /// Left part of the expression
         /// </summary>
-        public IExpressionNode Left { get { return _left; } set { _left = value; ApplyType(); } }
-        private IExpressionNode _left;
+        public ExpressionNode Left { get { return _left; } set { _left = value; ApplyType(); } }
+        private ExpressionNode _left;
         /// <summary>
         /// Right part of the expression
         /// </summary>
-        public IExpressionNode Right { get { return _right; } set { _right = value; ApplyType(); } }
-        private IExpressionNode _right;
+        public ExpressionNode Right { get { return _right; } set { _right = value; ApplyType(); } }
+        private ExpressionNode _right;
 
-        public PolyType Type { get; protected set; }
-
-        public BinaryExpressionNode(IAstNode parent)
-        {
-            Parent = parent;
-        }
+        public BinaryExpressionNode(AstNode parent, int line) : base(parent, line) { }
 
         public virtual void ApplyType()
         {
@@ -47,12 +41,12 @@ namespace PolyToolkit.Parsing.Ast
 
         public bool IsTypesValid()
         {
-            if(Left != null && Right != null)
+            if (Left != null && Right != null)
             {
                 return Left.Type == Right.Type;
             }
-
-            return false;
+            else
+                return true; // Ignore unknown types
         }
     }
 }

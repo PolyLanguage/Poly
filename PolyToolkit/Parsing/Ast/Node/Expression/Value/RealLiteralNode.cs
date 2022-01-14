@@ -6,18 +6,13 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: 1.0200300
     /// </summary>
-    public class RealLiteralNode : IExpressionNode
+    public sealed class RealLiteralNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
-
-        public PolyType Type { get { return PolyType.RealType; } }
         public double Value { get; }
 
-        public RealLiteralNode(IAstNode parent, double value)
+        public RealLiteralNode(AstNode parent, double value, int line) : base(parent, line)
         {
-            Parent = parent;
-
+            Type = PolyType.RealType;
             Value = value;
         }
     }

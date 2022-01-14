@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace PolyToolkit.Parsing.Ast
 {
-    public class NamespaceStmtNode : IAstNode
+    /// <summary>
+    /// Example: namespace "hello";
+    /// </summary>
+    public sealed class NamespaceStmtNode : AstNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { NamespaceValue }; } }
+        public string NamespaceValue { get; set; }
 
-        public StringLiteralNode NamespaceValue { get; set; }
-
-        public NamespaceStmtNode(IAstNode parent)
-        {
-            Parent = parent;
-        }
+        public NamespaceStmtNode(AstNode parent, int line) : base(parent, line) { }
     }
 }

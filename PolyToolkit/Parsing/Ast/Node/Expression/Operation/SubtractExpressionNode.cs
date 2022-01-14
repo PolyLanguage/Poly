@@ -4,8 +4,8 @@ namespace PolyToolkit.Parsing.Ast
 {
     public class SubtractExpressionNode : ArithmeticExpressionNode
     {
-        public SubtractExpressionNode(IAstNode parent)
-            : base (parent)
+        public SubtractExpressionNode(AstNode parent, int line)
+            : base (parent, line)
         { }
 
         /*public override object Apply(object leftvalue, object rightvalue)

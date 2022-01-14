@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
     /// Example: import: "System";
     /// </summary>
-    public class ImportStmtNode : IAstNode
+    public sealed class ImportStmtNode : AstNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { ImportValue }; } }
-        public StringLiteralNode ImportValue { get; set; }
+        public string ImportValue { get; set; }
 
-        public ImportStmtNode(IAstNode parent)
-        {
-            Parent = parent;
-        }
+        public ImportStmtNode(AstNode parent, int line) : base(parent, line) { }
     }
 }

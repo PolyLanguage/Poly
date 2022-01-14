@@ -6,18 +6,13 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: "a"
     /// </summary>
-    public class StringLiteralNode : IExpressionNode
+    public sealed class StringLiteralNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
-
-        public PolyType Type { get { return PolyType.StringType; } }
         public string Value { get; }
 
-        public StringLiteralNode(IAstNode parent, string value)
+        public StringLiteralNode(AstNode parent, string value, int line) : base(parent, line)
         {
-            Parent = parent;
-
+            Type = PolyType.StringType;
             Value = value;
         }
     }

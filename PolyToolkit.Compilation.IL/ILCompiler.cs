@@ -40,7 +40,7 @@ namespace PolyToolkit.Compilation.IL
             foreach(PolyCodefile file in program.Files)
             {
                 //check every node in root
-                foreach(IAstNode node in file.CodeTree.Childs)
+                foreach(AstNode node in file.CodeTree.Childs)
                 {
                     //class
                     if(node is ClassNode)
@@ -51,7 +51,7 @@ namespace PolyToolkit.Compilation.IL
                         TypeBuilder tb = md.DefineType(clNode.ClassName,
                             TypeAttributes.Public);
                         //define class childs
-                        foreach(IAstNode clChild in clNode.Childs)
+                        foreach(AstNode clChild in clNode.Childs)
                         {
                             if(clChild is VarDeclarationStmtNode)
                             {
@@ -68,7 +68,7 @@ namespace PolyToolkit.Compilation.IL
                                     MethodAttributes.Public, methNode.MethodReturnType.ToNativeType(),methNode.MethodArgs.Values.ToList().ToNativeArray());
 
                                 ILGenerator gen = mb.GetILGenerator();
-                                foreach(IAstNode methChild in methNode.Childs)
+                                foreach(AstNode methChild in methNode.Childs)
                                 {
                                     if (methChild is VarDeclarationStmtNode)
                                     {
@@ -104,13 +104,13 @@ namespace PolyToolkit.Compilation.IL
         }
 
         #region IL Generation
-        private void DefineLocalVariable(ILGenerator gen,PolyType type,IExpressionNode value)
+        private void DefineLocalVariable(ILGenerator gen,PolyType type,ExpressionNode value)
         {
             LocalBuilder varbuilder = gen.DeclareLocal(type.ToNativeType());
             EmitValue(varbuilder, value);
         }
 
-        private void EmitValue(LocalBuilder gen,IExpressionNode value)
+        private void EmitValue(LocalBuilder gen, ExpressionNode value)
         {
 
         }

@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "First Gen", "First Gen", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyToolkit.Interpreter", "PolyToolkit.Interpreter\PolyToolkit.Interpreter.csproj", "{430BFFD6-9FA9-4C53-950F-F477174DC980}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyToolkit.VM", "PolyToolkit.VM\PolyToolkit.VM.csproj", "{99D20A13-C32B-4A99-BB39-37107D7E5B2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{430BFFD6-9FA9-4C53-950F-F477174DC980}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{430BFFD6-9FA9-4C53-950F-F477174DC980}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{430BFFD6-9FA9-4C53-950F-F477174DC980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D20A13-C32B-4A99-BB39-37107D7E5B2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D20A13-C32B-4A99-BB39-37107D7E5B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D20A13-C32B-4A99-BB39-37107D7E5B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D20A13-C32B-4A99-BB39-37107D7E5B2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +103,7 @@ Global
 		{8EC7D27B-C619-40F5-9A56-334BC70615D4} = {C2EA135E-DDC8-434A-B710-7025B0EE55E5}
 		{800B3B8C-C647-45FA-8996-542896A44155} = {C2EA135E-DDC8-434A-B710-7025B0EE55E5}
 		{430BFFD6-9FA9-4C53-950F-F477174DC980} = {AABA138A-D982-46D1-8D4B-7E7B4D54CA47}
+		{99D20A13-C32B-4A99-BB39-37107D7E5B2D} = {AABA138A-D982-46D1-8D4B-7E7B4D54CA47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {71D31A43-64FC-4947-AC12-8940050759E6}

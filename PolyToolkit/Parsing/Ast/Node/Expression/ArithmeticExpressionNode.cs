@@ -4,8 +4,8 @@ namespace PolyToolkit.Parsing.Ast
 {
     public abstract class ArithmeticExpressionNode : BinaryExpressionNode
     {
-        public ArithmeticExpressionNode(IAstNode parent)
-            : base(parent)
+        public ArithmeticExpressionNode(AstNode parent, int line)
+            : base(parent, line)
         { }
 
         public override void ApplyType()
@@ -18,9 +18,7 @@ namespace PolyToolkit.Parsing.Ast
                 if (Left.Type == Right.Type)
                     this.Type = Left.Type;
                 //real
-                else if ((Left.Type == PolyType.IntType && Right.Type == PolyType.RealType) ||
-                    (Left.Type == PolyType.RealType && Right.Type == PolyType.IntType) ||
-                    (Left.Type == PolyType.RealType && Right.Type == PolyType.RealType))
+                else if (Left.Type == PolyType.RealType || Right.Type == PolyType.RealType)
                     this.Type = PolyType.RealType;
                 //object
                 else if (Left.Type == PolyType.ObjectType || Right.Type == PolyType.ObjectType)

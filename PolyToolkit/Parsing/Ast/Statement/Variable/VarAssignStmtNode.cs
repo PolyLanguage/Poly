@@ -7,18 +7,14 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: string a = 200+300;
     /// </summary>
-    public class VarAssignStmtNode : IAstNode
+    public sealed class VarAssignStmtNode : AstNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { VarValue }; } }
+        public override List<AstNode> Childs { get => new List<AstNode>() { VarValue }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
 
         public string VarName { get; set; }
-        public IExpressionNode VarValue { get; set; }
+        public ExpressionNode VarValue { get; set; }
 
-        public VarAssignStmtNode(IAstNode parent)
-        {
-            Parent = parent;
-        }
+        public VarAssignStmtNode(AstNode parent, int line) : base(parent, line) { }
 
         /// <summary>
         /// Check if declaration type equals value type
@@ -27,7 +23,7 @@ namespace PolyToolkit.Parsing.Ast
         public bool IsTypesValid()
         {
             if (VarValue != null)
-                return Parent.GetFirstParentVar(VarName) == VarValue.Type;
+                return Parent.GetVarType(VarName) == VarValue.Type;
             else
                 return false;
         }

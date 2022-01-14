@@ -58,6 +58,11 @@ namespace PolyToolkit.Interpreter
                 Console.WriteLine("[Scope Tree]");
                 program.Files[0].CodeTree.PrintScope();
             }
+
+            Console.WriteLine("[Execution]");
+            PolyInterpreter interpreter = new PolyInterpreter(program.Files[0].CodeTree, new Entrypoint("Program", "Main"), new ErrorHandler());
+            interpreter.Begin();
+
             Console.ReadLine();
         }
     }

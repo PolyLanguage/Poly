@@ -8,20 +8,23 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Contains ast of code
     /// </summary>
-    public class CodeTree : IWithBody
+    public sealed class CodeTree : BlockNode
     {
+        public override List<AstNode> Childs { get; set; }
+
         /// <summary>
-        /// Code tree cannot have any parent
+        /// Create code tree from parser instance
         /// </summary>
-        public IAstNode Parent { get { return null; } set { throw new InvalidOperationException("Parent cannot be set"); } }
-
-        public List<IAstNode> Childs { get; set; }
-
-        public CodeTree(PolyParser fromparser)
+        /// <param name="fromparser"></param>
+        public CodeTree(PolyParser fromparser) : base(null, 0)
         {
             Childs = fromparser.ParseCode().Childs;
         }
-        public CodeTree(List<IAstNode> tree)
+        /// <summary>
+        /// Create code tree from list of nodes
+        /// </summary>
+        /// <param name="tree"></param>
+        public CodeTree(List<AstNode> tree) : base(null, 0)
         {
             Childs = tree;
         }
@@ -32,12 +35,12 @@ namespace PolyToolkit.Parsing.Ast
         /// </summary>
         public void PrintAst()
         {
-            foreach(IAstNode node in Childs)
+            foreach(AstNode node in Childs)
             {
                 PrintAstNode(node,0);
             }
         }
-        private void PrintAstNode(IAstNode node, int lvl)
+        private void PrintAstNode(AstNode node, int lvl)
         {
             //add spaces from lvl
             StringBuilder lvlstr = new StringBuilder("");
@@ -70,20 +73,20 @@ namespace PolyToolkit.Parsing.Ast
             {
                 Console.WriteLine(lvlstr.ToString() + node.ToString().Replace("PolyToolkit.Parsing.Ast.", "") + content);
                 //print childs
-                foreach (IAstNode child in node.Childs)
+                foreach (AstNode child in node.Childs)
                     PrintAstNode(child, lvl + 1);
             }
         }
 
         public void PrintScope()
         {
-            foreach(IAstNode child in Childs)
+            foreach(AstNode child in Childs)
             {
                 if(child is ClassNode)
                     PrintScopeNode(child, 0);
             }
         }
-        private void PrintScopeNode(IAstNode node,int lvl)
+        private void PrintScopeNode(AstNode node,int lvl)
         {
             //add spaces from lvl
             string lvlstr = "";
@@ -141,14 +144,14 @@ namespace PolyToolkit.Parsing.Ast
                 if (container)
                 {
                     //print childs
-                    foreach (IAstNode child in node.Childs)
+                    foreach (AstNode child in node.Childs)
                         PrintScopeNode(child, lvl + 1);
                 }
             }
         }
         #endregion
 
-        public bool IsAllowed<T>() where T : IAstNode
+        public override bool IsAllowed<T>()
         {
             if (AstExtensions.IsAllowedInGlobal<T>())
                 return true;

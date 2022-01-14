@@ -7,22 +7,20 @@ using System.Threading.Tasks;
 namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
-    /// Can contain only variable & method declarations
+    /// Example: class Car { }
     /// </summary>
-    public class ClassNode : IAstNode, IWithBody
+    public sealed class ClassNode : BlockNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get; set; }
+        public override List<AstNode> Childs { get; set; }
 
         public string ClassName { get; set; }
 
-        public ClassNode(IAstNode parent)
+        public ClassNode(AstNode parent, int line) : base(parent, line)
         {
-            Parent = parent;
-            Childs = new List<IAstNode>();
+            Childs = new List<AstNode>();
         }
 
-        public bool IsAllowed<T>() where T : IAstNode
+        public override bool IsAllowed<T>()
         {
             if (AstExtensions.IsAllowedInClass<T>())
                 return true;

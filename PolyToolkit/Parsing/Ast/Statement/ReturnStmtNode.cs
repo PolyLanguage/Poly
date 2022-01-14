@@ -7,16 +7,11 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: return 200 + x;
     /// </summary>
-    public class ReturnStmtNode : IAstNode
+    public sealed class ReturnStmtNode : AstNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>() { ReturnValue }; } }
+        public override List<AstNode> Childs { get => new List<AstNode>() { ReturnValue }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
+        public ExpressionNode ReturnValue { get; set; }
 
-        public IExpressionNode ReturnValue { get; set; }
-
-        public ReturnStmtNode(IAstNode parent)
-        {
-            Parent = parent;
-        }
+        public ReturnStmtNode(AstNode parent, int line) : base(parent, line) { }
     }
 }

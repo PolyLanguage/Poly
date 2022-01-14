@@ -6,18 +6,13 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: 200300100
     /// </summary>
-    public class IntLiteralNode : IExpressionNode
+    public sealed class IntLiteralNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
-
-        public PolyType Type { get { return PolyType.IntType; } }
         public int Value { get; }
 
-        public IntLiteralNode(IAstNode parent, int value)
+        public IntLiteralNode(AstNode parent, int value, int line) : base(parent, line)
         {
-            Parent = parent;
-
+            Type = PolyType.IntType;
             Value = value;
         }
     }

@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
     /// Example: a
     /// </summary>
-    public class VarNameNode : IExpressionNode
+    public sealed class VarNameNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
+        public override List<AstNode> Childs { get => new List<AstNode>(); set => throw new InvalidOperationException("Childs of this node cannot be set"); }
 
-        public PolyType Type { get; }
+        /// <summary>
+        /// Name of the variable to get
+        /// </summary>
         public string Name { get; }
 
-        public VarNameNode(IAstNode parent, string varname, PolyType vartype)
+        public VarNameNode(AstNode parent, string varname, PolyType vartype, int line) : base(parent, line)
         {
-            Parent = parent;
-
             Type = vartype;
             Name = varname;
         }

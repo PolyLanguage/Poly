@@ -1,10 +1,12 @@
-﻿<Properties StartupConfiguration="{F8FDBC56-E420-460C-9923-28EFBFEF988A}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="PolyToolkit.Interpreter/PolyInterpreter.cs">
+﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{430BFFD6-9FA9-4C53-950F-F477174DC980}|Default">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="398" Column="67" />
-      <File FileName="PolyToolkit/Parsing/Ast/AstExtensions.cs" Line="217" Column="40" />
-      <File FileName="PolyToolkit/Other/PolyType.cs" Line="102" Column="10" />
-      <File FileName="PolyToolkit.Interpreter/PolyInterpreter.cs" Line="23" Column="48" />
+      <File FileName="PolyToolkit.Interpreter/PolyInterpreter.cs" Line="100" Column="45" />
+      <File FileName="PolyToolkit.Interpreter/PolyScope.cs" Line="53" Column="10" />
+      <File FileName="PolyToolkit.Interpreter/PolySymbol.cs" Line="48" Column="55" />
+      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="206" Column="1" />
+      <File FileName="PolyToolkit/Parsing/Ast/AstExtensions.cs" Line="383" Column="29" />
+      <File FileName="PolyToolkit/Parsing/Ast/Statement/Variable/VarAssignStmtNode.cs" Line="26" Column="41" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -16,26 +18,35 @@
             <Node name="Toolkit" expanded="True">
               <Node name="First Gen" expanded="True">
                 <Node name="PolyToolkit" expanded="True">
+                  <Node name="Core" expanded="True" />
                   <Node name="Parsing" expanded="True">
-                    <Node name="Ast" expanded="True" />
+                    <Node name="Ast" expanded="True">
+                      <Node name="Node" expanded="True">
+                        <Node name="Class" expanded="True">
+                          <Node name="ClassNode.cs" selected="True" />
+                        </Node>
+                      </Node>
+                      <Node name="Statement" expanded="True">
+                        <Node name="Variable" expanded="True" />
+                      </Node>
+                    </Node>
                   </Node>
                 </Node>
-                <Node name="PolyToolkit.Interpreter" expanded="True">
-                  <Node name="PolyInterpreter.cs" selected="True" />
-                </Node>
+                <Node name="PolyToolkit.Compilation.IL" expanded="True" />
+                <Node name="PolyToolkit.Interpreter" expanded="True" />
               </Node>
             </Node>
           </Node>
         </State>
       </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.Toolkit.First_220Gen.PolyToolkit.Interpreter FirstBuild="True" />
+  <MonoDevelop.Ide.ItemProperties.Toolkit.First_220Gen.PolyToolkit.Interpreter PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <Debugger.DebugSourceFolders>
+    <String>/Users/sergejkabirov/Desktop/Projects/Library/C#</String>
+  </Debugger.DebugSourceFolders>
   <MonoDevelop.Ide.ItemProperties.Samples.PolyToolkit.Sample PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

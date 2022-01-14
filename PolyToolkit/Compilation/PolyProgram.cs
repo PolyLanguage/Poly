@@ -49,16 +49,19 @@ namespace PolyToolkit.Compilation
         }
         public void AddFilesFromDir(string dirpath)
         {
-            //add files from dir
-            foreach(string file in Directory.GetFiles(dirpath))
+            if(Directory.Exists(dirpath))
             {
-                Files.Add(new PolyCodefile(file, file.Replace(dirpath, "")));
-            }
-            //add files from dirs in dir
-            foreach(string dirIn in Directory.GetDirectories(dirpath))
-            {
-                string prepath = "";
-                _AddFilesFromDir(prepath,dirpath);
+                //add files from dir
+                foreach (string file in Directory.GetFiles(dirpath))
+                {
+                    Files.Add(new PolyCodefile(file, file.Replace(dirpath, "")));
+                }
+                //add files from dirs in dir
+                foreach (string dirIn in Directory.GetDirectories(dirpath))
+                {
+                    string prepath = "";
+                    _AddFilesFromDir(prepath, dirpath);
+                }
             }
         }
         private void _AddFilesFromDir(string prepath,string dirpath)

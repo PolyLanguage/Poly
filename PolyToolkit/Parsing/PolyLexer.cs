@@ -17,11 +17,11 @@ namespace PolyToolkit.Parsing
         };
         private static char[] Operators = new char[]
         {
-            '-','+','*','/','%','=','>','<','!','?'
+            '-','+','*','/','%','=','>','<','!','?','&','|'
         };
         private static char[] SpecialChars = new char[]
         {
-            '#',',','^','$','@','&','~'
+            '#',',','^','$','@','~'
         };
 
         public string Code { get; set; }

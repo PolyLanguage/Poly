@@ -12,7 +12,7 @@ namespace PolyToolkit.Parsing
         //private
         private static string[][] BinaryOps = new string[][] 
         {
-            new string[] { "==", "!=", "<",">","<=",">=" }, //level 1
+            new string[] { "==", "!=", "<",">","<=",">=", "&&", "||" }, //level 1
             new string[] { "+", "-" }, //level 2
             new string[] { "*", "/", "%" } //level 3
         };
@@ -47,7 +47,7 @@ namespace PolyToolkit.Parsing
         /// <returns></returns>
         public CodeTree ParseCode()
         {
-            CurrentTree = new CodeTree(new List<IAstNode>());
+            CurrentTree = new CodeTree(new List<AstNode>());
 
             for (var node = this.ParseNode(CurrentTree, null);
                 node != null;
@@ -85,7 +85,7 @@ namespace PolyToolkit.Parsing
         /// <param name="parent"></param>
         /// <param name="until"></param>
         /// <returns></returns>
-        private IAstNode ParseNode(IWithBody parent,string until)
+        private AstNode ParseNode(BlockNode parent,string until)
         {
             PolyToken token = this.NextToken();
 
@@ -195,20 +195,36 @@ namespace PolyToolkit.Parsing
                 //return end
                 return null;
             }
-            //unknown
+            //expression/unknown
             else
-                Log.Add(new ParserError("Unknown or unexpected statement('" + token.Value + "')", CurrentLine, ThrowedIn.NodeParse));
+            {
+                Console.WriteLine("expr:"+token.Value);
 
-            return new UnknownNode(parent);
+                PushToken(token);
+
+                ExpressionNode expr = ParseBinaryExpression(0, parent);
+
+                ParseStatementEnd(); //;
+
+                if (expr != null)
+                {
+                    StepSuccess();
+                    return expr;
+                }
+                else
+                    Log.Add(new ParserError("Unknown or unexpected statement('" + token.Value + "')", CurrentLine, ThrowedIn.NodeParse));
+            }
+
+            return new UnknownNode(parent, CurrentLine);
         }
         #endregion
 
         #region Parse Statement
         //import <STATIC_STR>;
-        private ImportStmtNode ParseImportStmt(IAstNode parent)
+        private ImportStmtNode ParseImportStmt(AstNode parent)
         {
             //example: import: <STATIC_STR>;
-            ImportStmtNode node = new ImportStmtNode(parent);
+            ImportStmtNode node = new ImportStmtNode(parent, CurrentLine);
 
             node.ImportValue = ParseStringLiteral(node);
             ParseStatementEnd();
@@ -216,10 +232,10 @@ namespace PolyToolkit.Parsing
             return node;
         }
         //namespace <STATIC_STR>;
-        private NamespaceStmtNode ParseNamespaceStmt(IAstNode parent)
+        private NamespaceStmtNode ParseNamespaceStmt(AstNode parent)
         {
             //example: namespace <STATIC_STR>;
-            NamespaceStmtNode node = new NamespaceStmtNode(parent);
+            NamespaceStmtNode node = new NamespaceStmtNode(parent, CurrentLine);
 
             node.NamespaceValue = ParseStringLiteral(node);
             ParseStatementEnd();
@@ -228,10 +244,10 @@ namespace PolyToolkit.Parsing
         }
 
         //return <EXPR>;
-        private ReturnStmtNode ParseReturnStmt(IAstNode parent)
+        private ReturnStmtNode ParseReturnStmt(AstNode parent)
         {
             //example: return <EXPR>;
-            ReturnStmtNode node = new ReturnStmtNode(parent);
+            ReturnStmtNode node = new ReturnStmtNode(parent, CurrentLine);
 
             node.ReturnValue = ParseBinaryExpression(0, node);
             ParseStatementEnd();
@@ -250,9 +266,9 @@ namespace PolyToolkit.Parsing
 
         #region Parse Class
         //class <NAME> { <ALLOWED-NODES> }
-        private ClassNode ParseClass(IAstNode parent)
+        private ClassNode ParseClass(AstNode parent)
         {
-            ClassNode clnode = new ClassNode(parent);
+            ClassNode clnode = new ClassNode(parent, CurrentLine);
 
             //parse class name
             clnode.ClassName = ParseName();
@@ -266,10 +282,8 @@ namespace PolyToolkit.Parsing
                 node = this.ParseNode(clnode,"}"))
             {
                 //not unknown
-                if(node is UnknownNode==false)
-                {
+                if(node is UnknownNode == false)
                     clnode.Childs.Add(node);
-                }
             }
 
             //expect block end
@@ -278,13 +292,13 @@ namespace PolyToolkit.Parsing
             return clnode;
         }
         //ctor (<ARGS>) { <ALLOWED-NODES> }
-        private ClassCtorNode ParseClassCtor(IAstNode parent)
+        private ClassCtorNode ParseClassCtor(AstNode parent)
         {
             //inst
-            ClassCtorNode ctornode = new ClassCtorNode(parent);
+            ClassCtorNode ctornode = new ClassCtorNode(parent, CurrentLine);
 
             //identification
-            ctornode.CtorArgs = ParseArgs(ctornode);
+            ctornode.CtorArgs = ParseDefArgs(ctornode);
 
             ParseCodeblockStart(); // {
 
@@ -295,9 +309,7 @@ namespace PolyToolkit.Parsing
             {
                 //declare var OR etc
                 if (node is UnknownNode == false)
-                {
                     ctornode.Childs.Add(node);
-                }
             }
 
             ParseCodeblockEnd(); // }
@@ -308,9 +320,9 @@ namespace PolyToolkit.Parsing
 
         #region Parse Variable
         //<TYPE> <NAME> = <EXPRESSION>; //TODO: ARRAYS DECLARATION, OBJECTS DECLARATION
-        private VarDeclarationStmtNode ParseVarDeclaration(IAstNode parent)
+        private VarDeclarationStmtNode ParseVarDeclaration(AstNode parent)
         {
-            VarDeclarationStmtNode node = new VarDeclarationStmtNode(parent);
+            VarDeclarationStmtNode node = new VarDeclarationStmtNode(parent, CurrentLine);
 
             node.VarType = ParseType(); // string/int/ etc...
             node.VarName = ParseName(); //varname
@@ -336,9 +348,9 @@ namespace PolyToolkit.Parsing
             return node;
         }
         //<NAME> = <EXPRESSION>;
-        private VarAssignStmtNode ParseVarAssignation(IAstNode parent)
+        private VarAssignStmtNode ParseVarAssignation(AstNode parent)
         {
-            VarAssignStmtNode node = new VarAssignStmtNode(parent);
+            VarAssignStmtNode node = new VarAssignStmtNode(parent, CurrentLine);
 
             node.VarName = ParseName();
 
@@ -352,7 +364,7 @@ namespace PolyToolkit.Parsing
                     CurrentLine, ThrowedIn.SpecifiedNodeParse));
             //check types for mismatch
             else if (!node.IsTypesValid())
-                Log.Add(new ParserError("Type mismatch (" + parent.GetFirstParentVar(node.VarName).Name + " & " + node.VarValue.Type.Name + ")",
+                Log.Add(new ParserError("Type mismatch (" + parent.GetVarType(node.VarName).Name + " & " + node.VarValue.Type.Name + ")",
                     CurrentLine, ThrowedIn.SpecifiedNodeParse));
 
             return node;
@@ -361,22 +373,31 @@ namespace PolyToolkit.Parsing
         #endregion
 
         #region Parse Method
-        //method <TYPENAME> <NAME> (<ARGS>) { <ALLOWED-NODES> }
-        private MethodNode ParseMethod(IAstNode parent)
+        //method <TYPENAME>? <NAME> (<ARGS>) { <ALLOWED-NODES> }
+        private MethodNode ParseMethod(AstNode parent)
         {
-            MethodNode methnode = new MethodNode(parent);
-            //identification
+
+            MethodNode methnode = new MethodNode(parent, CurrentLine);
+
+            //return type
             PolyToken next = NextToken();
+            //type exists?
             if (PolyType.FromName(next.Value) != PolyType.UnknownType)
                 methnode.MethodReturnType = PolyType.FromName(next.Value);
+            //type not exists, type was not specified
             else
             {
                 methnode.MethodReturnType = PolyType.NoneType;
                 PushToken(next);
             }
             int methodDeclLine = CurrentLine;
+
+            //name
             methnode.MethodName = ParseName();
-            methnode.MethodArgs = ParseArgs(methnode);
+
+            //args
+            methnode.MethodArgs = ParseDefArgs(methnode);
+
             //body
             ParseCodeblockStart(); // {
 
@@ -421,7 +442,7 @@ namespace PolyToolkit.Parsing
         /// </summary>
         private void ParseStatementEnd()
         {
-            if(TryParseToken(PolyTokenType.Delimiter, ";",true)==false)
+            if(TryParseToken(PolyTokenType.Delimiter, ";", true) == false)
             {
                 Log.Add(new ParserError("Expected end of statement", CurrentLine,
                     ThrowedIn.SpecifiedTokenParse));
@@ -538,7 +559,7 @@ namespace PolyToolkit.Parsing
         /// </summary>
         private void ParseColon()
         {
-            if (TryParseToken(PolyTokenType.Delimiter, ":",true) == false)
+            if (TryParseToken(PolyTokenType.Delimiter, ":", true) == false)
             {
                 Log.Add(new ParserError("Expected ':'", CurrentLine,
                     ThrowedIn.SpecifiedTokenParse));
@@ -554,12 +575,12 @@ namespace PolyToolkit.Parsing
         /// </summary>
         /// <param name="level"></param>
         /// <returns></returns>
-        private IExpressionNode ParseBinaryExpression(int level, IAstNode parent)
+        private ExpressionNode ParseBinaryExpression(int level, AstNode parent)
         {
             if (level >= BinaryOps.Length)
                 return this.ParseTerm(parent);
 
-            IExpressionNode lval = this.ParseBinaryExpression(level + 1, parent);
+            ExpressionNode lval = this.ParseBinaryExpression(level + 1, parent);
             if (lval == null)
                 return null;
 
@@ -573,9 +594,9 @@ namespace PolyToolkit.Parsing
                 {
                     //arithmetic operators
                     case "+":
-                        AddExpressionNode addnode = new AddExpressionNode(parent);
+                        AddExpressionNode addnode = new AddExpressionNode(parent, CurrentLine);
                         addnode.Left = lval;
-                        IExpressionNode add_rval = this.ParseBinaryExpression(level + 1, addnode);
+                        ExpressionNode add_rval = this.ParseBinaryExpression(level + 1, addnode);
                         addnode.Right = add_rval;
 
                         lval = addnode;
@@ -588,9 +609,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "-":
-                        SubtractExpressionNode subnode = new SubtractExpressionNode(parent);
+                        SubtractExpressionNode subnode = new SubtractExpressionNode(parent, CurrentLine);
                         subnode.Left = lval;
-                        IExpressionNode sub_rval = this.ParseBinaryExpression(level + 1, subnode);
+                        ExpressionNode sub_rval = this.ParseBinaryExpression(level + 1, subnode);
                         subnode.Right = sub_rval;
 
                         lval = subnode;
@@ -603,9 +624,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "*":
-                        MultiplyExpressionNode mulnode = new MultiplyExpressionNode(parent);
+                        MultiplyExpressionNode mulnode = new MultiplyExpressionNode(parent, CurrentLine);
                         mulnode.Left = lval;
-                        IExpressionNode mul_rval = this.ParseBinaryExpression(level + 1, mulnode);
+                        ExpressionNode mul_rval = this.ParseBinaryExpression(level + 1, mulnode);
                         mulnode.Right = mul_rval;
 
                         lval = mulnode;
@@ -618,9 +639,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "/":
-                        DivideExpressionNode divnode = new DivideExpressionNode(parent);
+                        DivideExpressionNode divnode = new DivideExpressionNode(parent, CurrentLine);
                         divnode.Left = lval;
-                        IExpressionNode div_rval = this.ParseBinaryExpression(level + 1, divnode);
+                        ExpressionNode div_rval = this.ParseBinaryExpression(level + 1, divnode);
                         divnode.Right = div_rval;
 
                         lval = divnode;
@@ -629,13 +650,17 @@ namespace PolyToolkit.Parsing
                             Log.Add(new ParserError("Operator '/' cannot be applied to operands of type " +
                                 " '" + divnode.Left.Type.Name + "' and '" + divnode.Right.Type.Name + "'",
                                 CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                        //check for dividing by 0 error
+                        else if(div_rval is IntLiteralNode && ((IntLiteralNode)div_rval).Value == 0)
+                            Log.Add(new ParserError("Cannot divide by zero",
+                                CurrentLine, ThrowedIn.SpecifiedNodeParse));
                         else
                             StepSuccess();
                         break;
                     case "%":
-                        ModulusExpressionNode modnode = new ModulusExpressionNode(parent);
+                        ModulusExpressionNode modnode = new ModulusExpressionNode(parent, CurrentLine);
                         modnode.Left = lval;
-                        IExpressionNode mod_rval = this.ParseBinaryExpression(level + 1, modnode);
+                        ExpressionNode mod_rval = this.ParseBinaryExpression(level + 1, modnode);
                         modnode.Right = mod_rval;
 
                         lval = modnode;
@@ -649,9 +674,9 @@ namespace PolyToolkit.Parsing
                         break;
                     //boolean operators
                     case "==":
-                        EqualsExpressionNode eqnode = new EqualsExpressionNode(parent);
+                        EqualsExpressionNode eqnode = new EqualsExpressionNode(parent, CurrentLine);
                         eqnode.Left = lval;
-                        IExpressionNode eq_rval = this.ParseBinaryExpression(level + 1, eqnode);
+                        ExpressionNode eq_rval = this.ParseBinaryExpression(level + 1, eqnode);
                         eqnode.Right = eq_rval;
 
                         lval = eqnode;
@@ -664,9 +689,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "!=":
-                        NotEqualsExpressionNode neqnode = new NotEqualsExpressionNode(parent);
+                        NotEqualsExpressionNode neqnode = new NotEqualsExpressionNode(parent, CurrentLine);
                         neqnode.Left = lval;
-                        IExpressionNode neq_rval = this.ParseBinaryExpression(level + 1, neqnode);
+                        ExpressionNode neq_rval = this.ParseBinaryExpression(level + 1, neqnode);
                         neqnode.Right = neq_rval;
 
                         lval = neqnode;
@@ -679,9 +704,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "<":
-                        LessThanExpressionNode lesstnode = new LessThanExpressionNode(parent);
+                        LessThanExpressionNode lesstnode = new LessThanExpressionNode(parent, CurrentLine);
                         lesstnode.Left = lval;
-                        IExpressionNode lesst_rval = this.ParseBinaryExpression(level + 1, lesstnode);
+                        ExpressionNode lesst_rval = this.ParseBinaryExpression(level + 1, lesstnode);
                         lesstnode.Right = lesst_rval;
 
                         lval = lesstnode;
@@ -694,9 +719,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case "<=":
-                        LessThanOrEqualsExpressionNode lesseqnode = new LessThanOrEqualsExpressionNode(parent);
+                        LessThanOrEqualsExpressionNode lesseqnode = new LessThanOrEqualsExpressionNode(parent, CurrentLine);
                         lesseqnode.Left = lval;
-                        IExpressionNode lesseq_rval = this.ParseBinaryExpression(level + 1, lesseqnode);
+                        ExpressionNode lesseq_rval = this.ParseBinaryExpression(level + 1, lesseqnode);
                         lesseqnode.Right = lesseq_rval;
 
                         lval = lesseqnode;
@@ -709,9 +734,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case ">":
-                        MoreThanExpressionNode moretnode = new MoreThanExpressionNode(parent);
+                        MoreThanExpressionNode moretnode = new MoreThanExpressionNode(parent, CurrentLine);
                         moretnode.Left = lval;
-                        IExpressionNode moret_rval = this.ParseBinaryExpression(level + 1, moretnode);
+                        ExpressionNode moret_rval = this.ParseBinaryExpression(level + 1, moretnode);
                         moretnode.Right = moret_rval;
 
                         lval = moretnode;
@@ -724,9 +749,9 @@ namespace PolyToolkit.Parsing
                             StepSuccess();
                         break;
                     case ">=":
-                        MoreThanOrEqualsExpressionNode moreeqnode = new MoreThanOrEqualsExpressionNode(parent);
+                        MoreThanOrEqualsExpressionNode moreeqnode = new MoreThanOrEqualsExpressionNode(parent, CurrentLine);
                         moreeqnode.Left = lval;
-                        IExpressionNode moreeq_rval = this.ParseBinaryExpression(level + 1, moreeqnode);
+                        ExpressionNode moreeq_rval = this.ParseBinaryExpression(level + 1, moreeqnode);
                         moreeqnode.Right = moreeq_rval;
 
                         lval = moreeqnode;
@@ -737,6 +762,41 @@ namespace PolyToolkit.Parsing
                                 CurrentLine, ThrowedIn.SpecifiedNodeParse));
                         else
                             StepSuccess();
+                        break;
+                    //logical operators
+                    case "&&":
+                        AndExpressionNode andnode = new AndExpressionNode(parent, CurrentLine);
+                        andnode.Left = lval;
+                        ExpressionNode and_rval = this.ParseBinaryExpression(level + 1, andnode);
+                        andnode.Right = and_rval;
+
+                        lval = andnode;
+                        //check types
+                        if (!andnode.IsTypesValid())
+                            Log.Add(new ParserError("Operator '&&' cannot be applied to operands of type " +
+                                " '" + andnode.Left.Type.Name + "' and '" + andnode.Right.Type.Name + "'",
+                                CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                        else
+                            StepSuccess();
+                        break;
+                    case "||":
+                        OrExpressionNode ornode = new OrExpressionNode(parent, CurrentLine);
+                        ornode.Left = lval;
+                        ExpressionNode or_rval = this.ParseBinaryExpression(level + 1, ornode);
+                        ornode.Right = or_rval;
+
+                        lval = ornode;
+                        //check types
+                        if (!ornode.IsTypesValid())
+                            Log.Add(new ParserError("Operator '||' cannot be applied to operands of type " +
+                                " '" + ornode.Left.Type.Name + "' and '" + ornode.Right.Type.Name + "'",
+                                CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                        else
+                            StepSuccess();
+                        break;
+                    default:
+                        Log.Add(new ParserError("Unimplemented Operator '" + token.Value + "'",
+                            CurrentLine, ThrowedIn.SpecifiedNodeParse));
                         break;
                 }
             }
@@ -749,7 +809,7 @@ namespace PolyToolkit.Parsing
 
             return lval;
         }
-        private IExpressionNode ParseTerm(IAstNode parent)
+        private ExpressionNode ParseTerm(AstNode parent)
         {
             PolyToken token = NextToken();
 
@@ -760,30 +820,55 @@ namespace PolyToolkit.Parsing
 
             //bool literal
             if (token.Type == PolyTokenType.Name && (token.Value == "true" || token.Value == "false"))
-                return new BoolLiteralNode(parent, (bool)PolyType.LiteralToNative(token.Value));
+                return new BoolLiteralNode(parent, (bool)PolyType.LiteralToNative(token.Value), CurrentLine);
             //null literal
             else if (token.Type == PolyTokenType.Name && (token.Value == "null"))
-                return new NullLiteralNode(parent);
+                return new NullLiteralNode(parent, CurrentLine);
             //string literal
             else if (token.Type == PolyTokenType.String)
-                return new StringLiteralNode(parent, token.Value);
+                return new StringLiteralNode(parent, token.Value, CurrentLine);
             //int literal
             else if (token.Type == PolyTokenType.Integer)
-                return new IntLiteralNode(parent, int.Parse(token.Value, CultureInfo.InvariantCulture));
+                return new IntLiteralNode(parent, int.Parse(token.Value, CultureInfo.InvariantCulture), CurrentLine);
             //real(double) val
             else if (token.Type == PolyTokenType.Real)
-                return new RealLiteralNode(parent, double.Parse(token.Value, CultureInfo.InvariantCulture));
+                return new RealLiteralNode(parent, double.Parse(token.Value, CultureInfo.InvariantCulture), CurrentLine);
             //var/method call val
             else if (token.Type == PolyTokenType.Name)
             {
-                if (parent.IsVariableAvailable(token.Value))
+                PolyToken next = NextToken();
+                //method call
+                if (next.Type == PolyTokenType.SpecialCharacter && next.Value == "(")
                 {
-                    return new VarNameNode(parent, token.Value, parent.GetFirstParentVar(token.Value));
+                    if (parent.IsMethodAvailable(token.Value))
+                    {
+                        PushToken(next); //push back '('
 
-                    //TODO: method call val
+                        //get args
+                        List<ExpressionNode> args = ParseArgs(parent);
+
+                        return new MethodCallNode(parent, token.Value, parent.GetMethodType(token.Value), args, CurrentLine);
+                    }
+                    else
+                    {
+                        Log.Add(new ParserError($"Not found method in current scope ('{token.Value}')", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                        return new VarNameNode(parent, "_", PolyType.UnknownType, CurrentLine);
+                    }
                 }
+                //var
                 else
-                    Log.Add(new ParserError("Unknown identifier", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                {
+                    if (parent.IsVariableAvailable(token.Value))
+                    {
+                        PushToken(next); //push back after checking for method call
+                        return new VarNameNode(parent, token.Value, parent.GetVarType(token.Value), CurrentLine);
+                    }
+                    else
+                    {
+                        Log.Add(new ParserError($"Not found variable in current scope ('{token.Value}')", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                        return new VarNameNode(parent, "_", PolyType.UnknownType, CurrentLine);
+                    }
+                }
             }
 
             this.PushToken(token);
@@ -794,12 +879,12 @@ namespace PolyToolkit.Parsing
         /// Parses boolean expression
         /// </summary>
         /// <returns></returns>
-        private IExpressionNode ParseBooleanExpressionNode(IAstNode parent)
+        private ExpressionNode ParseBooleanExpressionNode(AstNode parent)
         {
             int exprLine = CurrentLine;
 
             //parse expression
-            IExpressionNode exprNode = ParseBinaryExpression(0,parent);
+            ExpressionNode exprNode = ParseBinaryExpression(0,parent);
             //check expression type if its invalid
             if (exprNode.Type != PolyType.BooleanType)
                 Log.Add(new ParserError("Expected boolean expression", exprLine, ThrowedIn.SpecifiedNodeParse));
@@ -820,12 +905,12 @@ namespace PolyToolkit.Parsing
 
         #region Parse Other
         /// <summary>
-        /// Parse arguments (not parses brackets)
+        /// Parse arguments
         /// <para>Example: int a, int b, string c</para>
         /// </summary>
         /// <param name="statementAfter"></param>
         /// <returns></returns>
-        private Dictionary<string,PolyType> ParseArgs(IAstNode parent,bool statementAfter=false)
+        private Dictionary<string, PolyType> ParseDefArgs(AstNode parent)
         {
             // '('
             ParseArgStart();
@@ -833,19 +918,20 @@ namespace PolyToolkit.Parsing
             //parse loop until ')'
             Dictionary<string, PolyType> args = new Dictionary<string, PolyType>();
             bool previousWasArg = false;
-            for(var node = NextToken();node != null && node.Value!=")";node = NextToken())
+            PolyToken token = null;
+            for(token = NextToken(); token != null && token.Value != ")"; token = NextToken())
             {
                 //arg
-                if(node.Type == PolyTokenType.Name)
+                if(token.Type == PolyTokenType.Name)
                 {
                     if (previousWasArg == false)
                     {
-                        PushToken(node);
+                        PushToken(token);
 
-                        string name;
-                        PolyType type;
+                        string name = "_";
+                        PolyType type = PolyType.UnknownType;
 
-                        ParseArg(out name,out type);
+                        ParseDefArg(out name, out type);
 
                         if (name != null && type != null)
                             args.Add(name,type);
@@ -855,7 +941,7 @@ namespace PolyToolkit.Parsing
                         Log.Add(new ParserError("Expected ',' or ')'", CurrentLine, ThrowedIn.SpecifiedNodeParse));
                 }
                 //args next
-                else if(node.Type == PolyTokenType.Delimiter && node.Value == ",")
+                else if(token.Type == PolyTokenType.Delimiter && token.Value == ",")
                 {
                     if (previousWasArg == false)
                     {
@@ -868,12 +954,12 @@ namespace PolyToolkit.Parsing
                 }
                 //unknown
                 else
-                    Log.Add(new ParserError("Unknown or unexpected statement in arguments('"+node.Value+"')", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                    Log.Add(new ParserError($"Unknown or unexpected statement in arguments ('{token.Value}')", CurrentLine, ThrowedIn.SpecifiedNodeParse));
             }
 
-            //statement
-            if(statementAfter)
-                ParseStatementEnd();
+            //last token not was ')'
+            if (token.Value == null)
+                Log.Add(new ParserError("Expected ')' after arguments definition", CurrentLine, ThrowedIn.SpecifiedNodeParse));
 
             return args;
         }
@@ -882,7 +968,7 @@ namespace PolyToolkit.Parsing
         /// <para>Example: int a</para>
         /// </summary>
         /// <returns></returns>
-        private void ParseArg(out string name,out PolyType type)
+        private void ParseDefArg(out string name,out PolyType type)
         {
             //parse type,name
             PolyType _type = ParseType();
@@ -901,6 +987,66 @@ namespace PolyToolkit.Parsing
                 type = null;
             }
         }
+
+        /// <summary>
+        /// Parse arguments
+        /// <para>Example: 'hello',somevar,1+2</para>
+        /// </summary>
+        private List<ExpressionNode> ParseArgs(AstNode parent)
+        {
+            // '('
+            ParseArgStart();
+
+            //parse loop until ')'
+            List<ExpressionNode> args = new List<ExpressionNode>();
+            bool previousWasArg = false;
+            PolyToken token = null;
+            for (token = NextToken(); token != null && token.Value != ")"; token = NextToken())
+            {
+
+                //args next
+                if (token.Type == PolyTokenType.Delimiter && token.Value == ",")
+                {
+                    if (previousWasArg == false)
+                    {
+                        StepErr(",");
+                        Log.Add(new ParserError("Expected argument", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                    }
+                    else
+                        StepSuccess();
+                    previousWasArg = false;
+                }
+                //arg
+                else
+                {
+                    if (previousWasArg == false)
+                    {
+                        PolyToken tempToken = token;
+                        PushToken(token);
+
+                        ExpressionNode expr = ParseBinaryExpression(0, parent);
+                        //was expression
+                        if (expr != null)
+                            args.Add(expr);
+                        //was not expression
+                        else
+                            Log.Add(new ParserError($"Unknown or unexpected statement in arguments('{tempToken.Value}')", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+
+                        previousWasArg = true;
+                    }
+                    else
+                        Log.Add(new ParserError("Expected ',' or ')'", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+                }
+            }
+
+            //last token not was ')'
+            if (token.Value == null)
+                Log.Add(new ParserError("Expected ')' after arguments", CurrentLine, ThrowedIn.SpecifiedNodeParse));
+
+
+            return args;
+        }
+
         /// <summary>
         /// Parse name node
         /// <para>Example: somename_123_name</para>
@@ -948,15 +1094,16 @@ namespace PolyToolkit.Parsing
             //return typename
             return PolyType.FromName(token.Value);
         }
+
         /// <summary>
         /// Parse index node
         /// <para>Example: [123]/[21321+12*1]</para>
         /// </summary>
         /// <returns></returns>
-        private IExpressionNode ParseIndex(IAstNode parent)
+        private ExpressionNode ParseIndex(AstNode parent)
         {
             ParseIndexStart();
-            IExpressionNode expr = ParseBinaryExpression(0,parent);
+            ExpressionNode expr = ParseBinaryExpression(0, parent);
             ParseIndexEnd();
 
             return expr;
@@ -967,7 +1114,7 @@ namespace PolyToolkit.Parsing
         /// <para>Example: "hello"/'world'</para>
         /// </summary>
         /// <returns></returns>
-        private StringLiteralNode ParseStringLiteral(IAstNode parent)
+        private string ParseStringLiteral(AstNode parent)
         {
             PolyToken token = this.NextToken();
             //if its not str
@@ -983,7 +1130,7 @@ namespace PolyToolkit.Parsing
                 StepSuccess();
             }
             //return str
-            return new StringLiteralNode(parent,token.Value.Replace('"'.ToString(),""));
+            return token.Value.Replace("\"","").Replace("'", "");
         }
         #endregion
 

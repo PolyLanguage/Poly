@@ -58,7 +58,7 @@ namespace PolyToolkit.Compilation.LIR
             LLVM.InitializeFunctionPassManager(passManager);
 
             //generate
-            foreach(IAstNode node in code.Childs)
+            foreach(AstNode node in code.Childs)
             {
                 VisitAndGenerate(node,module);
             }
@@ -66,14 +66,14 @@ namespace PolyToolkit.Compilation.LIR
             return module;
         }
 
-        private void VisitAndGenerate(IAstNode node,LLVMModuleRef module)
+        private void VisitAndGenerate(AstNode node,LLVMModuleRef module)
         {
             if(node is ClassNode)
             {
                 //generate class
 
                 //generate class members (method/field/constructor)
-                foreach (IAstNode clChild in ((ClassNode)node).Body.Childs)
+                foreach (AstNode clChild in ((ClassNode)node).Body.Childs)
                     VisitAndGenerate(node,module);
             }
         }

@@ -6,18 +6,13 @@ namespace PolyToolkit.Parsing.Ast
     /// <summary>
     /// Example: true
     /// </summary>
-    public class BoolLiteralNode : IExpressionNode
+    public sealed class BoolLiteralNode : ExpressionNode
     {
-        public IAstNode Parent { get; set; }
-        public List<IAstNode> Childs { get { return new List<IAstNode>(); } }
-
-        public PolyType Type { get { return PolyType.BooleanType; } }
         public bool Value { get; }
 
-        public BoolLiteralNode(IAstNode parent, bool value)
+        public BoolLiteralNode(AstNode parent, bool value, int line) : base(parent, line)
         {
-            Parent = parent;
-
+            Type = PolyType.BooleanType;
             Value = value;
         }
     }

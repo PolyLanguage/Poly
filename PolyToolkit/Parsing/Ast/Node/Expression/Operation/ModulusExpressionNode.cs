@@ -4,8 +4,8 @@ namespace PolyToolkit.Parsing.Ast
 {
     public class ModulusExpressionNode : ArithmeticExpressionNode
     {
-        public ModulusExpressionNode(IAstNode parent)
-            : base(parent)
+        public ModulusExpressionNode(AstNode parent, int line)
+            : base(parent, line)
         { }
 
         /*public override object Apply(object leftvalue, object rightvalue)

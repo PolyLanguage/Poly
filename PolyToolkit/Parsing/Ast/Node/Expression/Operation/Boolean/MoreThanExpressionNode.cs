@@ -6,8 +6,8 @@ namespace PolyToolkit.Parsing.Ast
     {
         private Func<object, object, bool> apply;
 
-        public MoreThanExpressionNode(IAstNode parent)
-            : base(parent)
+        public MoreThanExpressionNode(AstNode parent, int line)
+            : base(parent, line)
         { }
 
         public override void ApplyType()
@@ -39,8 +39,8 @@ namespace PolyToolkit.Parsing.Ast
     {
         private Func<object, object, bool> apply;
 
-        public MoreThanOrEqualsExpressionNode(IAstNode parent)
-            : base(parent)
+        public MoreThanOrEqualsExpressionNode(AstNode parent, int line)
+            : base(parent, line)
         { }
 
         public override void ApplyType()
