@@ -12,7 +12,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public IntLiteralNode(AstNode parent, int value, int line) : base(parent, line)
         {
-            Type = PolyType.IntType;
+            Type = PolyTypes.Int;
             Value = value;
         }
     }

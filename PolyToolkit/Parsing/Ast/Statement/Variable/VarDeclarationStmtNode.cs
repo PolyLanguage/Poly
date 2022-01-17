@@ -11,6 +11,8 @@ namespace PolyToolkit.Parsing.Ast
         public override List<AstNode> Childs { get => new List<AstNode>() { VarValue }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
 
         public string VarName { get; set; }
+        public bool IsConstant { get; set; } = false;
+
         public PolyType VarType { get; set; }
         public ExpressionNode VarValue { get; set; }
 
@@ -22,10 +24,10 @@ namespace PolyToolkit.Parsing.Ast
         /// <returns></returns>
         public bool IsTypesValid()
         {
-            if (VarValue != null)
-                return VarType == VarValue.Type;
+            if (VarValue == null)
+                return true;
             else
-                return false;
+                return VarType == VarValue.Type;
         }
     }
 }

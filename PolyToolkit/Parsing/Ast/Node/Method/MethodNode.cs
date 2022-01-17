@@ -24,10 +24,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public override bool IsAllowed<T>()
         {
-            if (AstExtensions.IsAllowedInMethod<T>())
-                return true;
-            else
-                return false;
+            return AstExtensions.IsAllowedInMethod<T>();
         }
     }
 }

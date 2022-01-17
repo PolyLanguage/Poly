@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PolyToolkit.Parsing.Ast
+﻿namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
     /// Example: null
@@ -12,7 +9,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public NullLiteralNode(AstNode parent, int line) : base(parent, line)
         {
-            Type = PolyType.ObjectType;
+            Type = PolyTypes.Null; //TODO: other type to be assignable to other types
         }
     }
 }

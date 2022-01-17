@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PolyToolkit.Parsing.Ast;
 
 namespace PolyToolkit.Interpreter
 {
@@ -8,7 +7,8 @@ namespace PolyToolkit.Interpreter
     {
         public enum Container
         {
-            Class,
+            Global,
+            Instance,
             Method,
             Loop
         }
@@ -35,6 +35,20 @@ namespace PolyToolkit.Interpreter
         }
 
         /// <summary>
+        /// Assign value to existing symbol if possible
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="newValue"></param>
+        public void Assign(string name, PolySymbol newValue)
+        {
+            //if not constant
+            if (IsConstant(name) == false)
+                this.ScopeMemory[name] = newValue;
+            else
+                throw new Exception("Cannot assign value to constant or not defined value");
+        }
+
+        /// <summary>
         /// Check if value is defined in scope
         /// </summary>
         /// <param name="name"></param>
@@ -45,6 +59,16 @@ namespace PolyToolkit.Interpreter
         }
 
         /// <summary>
+        /// Check if value is defined and constant
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool IsConstant(string name)
+        {
+            return this.ScopeMemory.ContainsKey(name) && this.ScopeMemory[name].IsConstant;
+        }
+
+        /// <summary>
         /// Check if value is defined in scope and has type
         /// </summary>
         /// <param name="name"></param>
@@ -52,7 +76,7 @@ namespace PolyToolkit.Interpreter
         public PolyType IsDefinedOfType(string name)
         {
             PolySymbol value = this.Get(name);
-            return value == null ? PolyType.UnknownType : value.Type;
+            return value == null ? PolyTypes.Unknown : value.Type;
         }
 
         /// <summary>

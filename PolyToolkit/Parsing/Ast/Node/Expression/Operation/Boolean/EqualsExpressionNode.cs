@@ -1,37 +1,9 @@
-﻿using System;
-
-namespace PolyToolkit.Parsing.Ast
+﻿namespace PolyToolkit.Parsing.Ast
 {
     public sealed class EqualsExpressionNode : BooleanExpressionNode
     {
-        private Func<object, object, bool> apply;
+        public override MathOperation Op { get { return MathOperation.Equals; } }
 
-        public EqualsExpressionNode(AstNode parent, int line)
-            : base(parent, line)
-        { }
-
-        public override void ApplyType()
-        {
-            base.ApplyType();
-
-            if (Left != null && Right != null)
-            {
-                if (Left.Type == PolyType.IntType && Right.Type == PolyType.IntType)
-                    this.apply = (a, b) => (int)a == (int)b;
-                else if (Left.Type == PolyType.RealType && Right.Type == PolyType.RealType)
-                    this.apply = (a, b) => (double)a == (double)b;
-                else if (Left.Type == PolyType.IntType && Right.Type == PolyType.RealType)
-                    this.apply = (a, b) => (int)a == (double)b;
-                else if (Left.Type == PolyType.RealType && Right.Type == PolyType.IntType)
-                    this.apply = (a, b) => (double)a == (int)b;
-            }
-        }
-        /*public override object Apply(object leftvalue, object rightvalue)
-        {
-            if (this.apply != null)
-                return this.apply(leftvalue, rightvalue);
-
-            return null;
-        }*/
+        public EqualsExpressionNode(AstNode parent, int line) : base(parent, line) { }
     }
 }

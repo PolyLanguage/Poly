@@ -124,10 +124,19 @@ namespace PolyToolkit.Parsing.Ast
             if (typeof(T) == typeof(ExpressionNode) ||
                 typeof(T) == typeof(VarDeclarationStmtNode) ||
                 typeof(T) == typeof(VarAssignStmtNode) ||
-                typeof(T) == typeof(ReturnStmtNode))
+                typeof(T) == typeof(ReturnStmtNode) ||
+                typeof(T) == typeof(IfNode))
                 return true;
             else
                 return false;
+        }
+        public static bool IsAllowedInCondition<T>() where T : AstNode
+        {
+            return IsAllowedInMethod<T>();
+        }
+        public static bool IsAllowedInLoop<T>() where T : AstNode
+        {
+            return IsAllowedInMethod<T>();
         }
         #endregion
 
@@ -167,12 +176,61 @@ namespace PolyToolkit.Parsing.Ast
         }
 
         /// <summary>
-        /// Find variable in scope
+        /// 
         /// </summary>
         /// <param name="container"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static PolyType GetVarType(this AstNode container, string name)
+        public static bool GetIsConstant(this AstNode container, string name)
+        {
+            //check in args (if method or ctor)
+            if (container is MethodNode)
+            {
+                foreach (string arg in ((MethodNode)container).MethodArgs.Keys)
+                    //args are constants
+                    if (arg == name)
+                        return true;
+            }
+            else if (container is ClassCtorNode)
+            {
+                foreach (string arg in ((ClassCtorNode)container).CtorArgs.Keys)
+                    //args are constants
+                    if (arg == name)
+                        return true;
+            }
+
+            //in current container
+            if (container is BlockNode)
+                foreach (AstNode node in container.Childs)
+                    //is var constant
+                    if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == name)
+                        return ((VarDeclarationStmtNode)node).IsConstant;
+                    //methods and classes are constants
+                    else if (node is MethodNode && ((MethodNode)node).MethodName == name)
+                        return true;
+                    else if (node is ClassNode && ((ClassNode)node).ClassName == name)
+                        return true;
+                    //TODO: CtorNode
+
+            //in parent container
+            if (container.Parent != null && container.Parent is CodeTree == false)
+                return container.Parent.GetIsConstant(name);
+
+            //TODO: in system library (property)
+            //in system library (method)
+            if (SystemLibrary.Methods.ContainsKey(name))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Find name type in scope
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static PolyType GetNameType(this AstNode container, string name)
         {
             //check in args (if method or ctor)
             if (container is MethodNode)
@@ -205,15 +263,24 @@ namespace PolyToolkit.Parsing.Ast
                 foreach (AstNode node in container.Childs)
                     if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == name)
                         return ((VarDeclarationStmtNode)node).VarType;
+                    else if (node is MethodNode && ((MethodNode)node).MethodName == name)
+                        return PolyTypes.Function;
+                    //TODO: else if(node is ClassNode && .ClassName == name) return type
+                    //TODO: CtorNode
 
             //in parent container
-            if(container.Parent != null && container.Parent is CodeTree == false)
-                return container.Parent.GetVarType(name);
+            if (container.Parent != null && container.Parent is CodeTree == false)
+                return container.Parent.GetNameType(name);
 
-            return PolyType.UnknownType;
+            //TODO: in system library (property)
+            //in system library (method)
+            if (SystemLibrary.Methods.ContainsKey(name))
+                return PolyTypes.Function;
+
+            return PolyTypes.Unknown;
         }
         /// <summary>
-        /// Find variable in scope
+        /// Find name in scope
         /// </summary>
         /// <param name="container"></param>
         /// <param name="name"></param>
@@ -230,11 +297,7 @@ namespace PolyToolkit.Parsing.Ast
             if (container.Parent != null && container.Parent is CodeTree == false)
                 return container.Parent.GetMethodType(name);
 
-            //in system library
-            if (SystemLibrary.Methods.ContainsKey(name))
-                return SystemLibrary.Methods[name];
-
-            return PolyType.UnknownType;
+            return PolyTypes.Unknown;
         }
 
         /// <summary>
@@ -278,16 +341,6 @@ namespace PolyToolkit.Parsing.Ast
 
             return null;
         }
-        /// <summary>
-        /// Find class constructor inside
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static ClassCtorNode GetCtor(this ClassNode container, PolyType[] args)
-        {
-            return container.GetCtor(args.ToList());
-        }
         #endregion
 
         #region Other
@@ -314,90 +367,14 @@ namespace PolyToolkit.Parsing.Ast
         }
 
         /// <summary>
-        /// Checks if variable available in available scopes
+        /// Checks if name available in scopes
         /// </summary>
-        /// <param name="curnode"></param>
-        /// <param name="varname"></param>
+        /// <param name="container"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public static bool IsVariableAvailable(this AstNode container, string varname)
+        public static bool IsNameIn(this AstNode container, string name)
         {
-            //check in current body
-            if (container is BlockNode)
-                if (IsVariableAvailableIn((BlockNode)container, varname))
-                    return true;
-
-            //check in parent body
-            if (container.Parent != null && container.Parent is CodeTree == false)
-                return container.Parent.IsVariableAvailable(varname);
-
-            return false;
-        }
-        /// <summary>
-        /// Checks if variable available in current scopes
-        /// </summary>
-        /// <param name="curnode"></param>
-        /// <param name="varname"></param>
-        /// <returns></returns>
-        public static bool IsVariableAvailableIn(this BlockNode container, string varname)
-        {
-            //check in args (if method or ctor)
-            if (container is MethodNode)
-            {
-                foreach (string arg in ((MethodNode)container).MethodArgs.Keys)
-                    if (arg == varname)
-                        return true;
-            }
-            else if (container is ClassCtorNode)
-            {
-                foreach (string arg in ((ClassCtorNode)container).CtorArgs.Keys)
-                    if (arg == varname)
-                        return true;
-            }
-
-            //check in current body
-            foreach (AstNode node in container.Childs)
-                if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == varname)
-                    return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if method available in available scopes
-        /// </summary>
-        /// <param name="curnode"></param>
-        /// <param name="methodname"></param>
-        /// <returns></returns>
-        public static bool IsMethodAvailable(this AstNode container, string methodname)
-        {
-            //check in current body
-            if (container is BlockNode)
-                if (IsMethodAvailableIn((BlockNode)container, methodname))
-                    return true;
-            //check in parent body
-            if (container.Parent != null && container.Parent is CodeTree == false)
-                return container.Parent.IsMethodAvailable(methodname);
-
-            //check in system library
-            if (SystemLibrary.Methods.ContainsKey(methodname))
-                return true;
-
-            return false;
-        }
-        /// <summary>
-        /// Checks if method available in current scopes
-        /// </summary>
-        /// <param name="curnode"></param>
-        /// <param name="methodname"></param>
-        /// <returns></returns>
-        public static bool IsMethodAvailableIn(this BlockNode container, string methodname)
-        {
-            //check in current body
-            foreach (AstNode node in container.Childs)
-                if (node is MethodNode && ((MethodNode)node).MethodName == methodname)
-                    return true;
-
-            return false;
+            return container.GetNameType(name) != PolyTypes.Unknown;
         }
         #endregion
     }

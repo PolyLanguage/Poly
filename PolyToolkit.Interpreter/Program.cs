@@ -17,11 +17,13 @@ namespace PolyToolkit.Interpreter
         {
             Console.Title = "PolyParser CLI";
 
+            bool stepLog = true;
+            bool actLog = true;
+
+            /*
             Console.WriteLine("Step Log ? (true/sa/-)");
             Console.Write("> ");
             string stepLogStr = Console.ReadLine();
-            bool stepLog = true;
-            bool actLog = true;
             if (stepLogStr == "true")
                 stepLog = true;
             if (stepLogStr != "sa")
@@ -32,6 +34,8 @@ namespace PolyToolkit.Interpreter
                 if (actLogStr == "true")
                     actLog = true;
             }
+            */
+
             Console.WriteLine("[Parsing (" + stepLog + actLog + ")]");
 
             string srcpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "polysrc";
@@ -45,6 +49,7 @@ namespace PolyToolkit.Interpreter
             string[] log = program.ParseAllFiles(stepLog, actLog);
             timer.Stop();
             Console.WriteLine("[Parsed: " + timer.ElapsedMilliseconds + "ms]");
+            timer.Reset();
 
             Console.ForegroundColor = ConsoleColor.DarkRed;
             foreach (string logMsg in log)
@@ -58,10 +63,12 @@ namespace PolyToolkit.Interpreter
                 Console.WriteLine("[Scope Tree]");
                 program.Files[0].CodeTree.PrintScope();
             }
-
             Console.WriteLine("[Execution]");
             PolyInterpreter interpreter = new PolyInterpreter(program.Files[0].CodeTree, new Entrypoint("Program", "Main"), new ErrorHandler());
+            timer.Start();
             interpreter.Begin();
+            timer.Stop();
+            Console.WriteLine("[Executed: " + timer.ElapsedMilliseconds + "ms]");
 
             Console.ReadLine();
         }

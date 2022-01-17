@@ -1,19 +1,11 @@
-﻿using System;
-
-namespace PolyToolkit.Parsing.Ast
+﻿namespace PolyToolkit.Parsing.Ast
 {
     public class ModulusExpressionNode : ArithmeticExpressionNode
     {
+        public override MathOperation Op { get { return MathOperation.Modulus; } }
+
         public ModulusExpressionNode(AstNode parent, int line)
             : base(parent, line)
         { }
-
-        /*public override object Apply(object leftvalue, object rightvalue)
-        {
-            if (leftvalue is int && rightvalye is int)
-                return (int)leftvalue % (int)rightvalue;
-            else
-                //exception...
-        }*/
     }
 }

@@ -8,4 +8,14 @@
   <ItemGroup>
     <ProjectReference Include="..\PolyToolkit\PolyToolkit.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Context\" />
+    <None Remove="Debug\" />
+    <None Remove="Other\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Context\" />
+    <Folder Include="Debug\" />
+    <Folder Include="Other\" />
+  </ItemGroup>
 </Project>

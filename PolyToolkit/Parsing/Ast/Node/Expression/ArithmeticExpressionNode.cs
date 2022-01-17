@@ -8,25 +8,14 @@ namespace PolyToolkit.Parsing.Ast
             : base(parent, line)
         { }
 
-        public override void ApplyType()
+        protected override void ApplyType()
         {
             base.ApplyType();
 
-            if (Left != null && Right != null)
-            {
-                //int
-                if (Left.Type == Right.Type)
-                    this.Type = Left.Type;
-                //real
-                else if (Left.Type == PolyType.RealType || Right.Type == PolyType.RealType)
-                    this.Type = PolyType.RealType;
-                //object
-                else if (Left.Type == PolyType.ObjectType || Right.Type == PolyType.ObjectType)
-                    this.Type = PolyType.ObjectType;
-                //else
-                else
-                    this.Type = PolyType.UnknownType;
-            }
+            if (Left != null && Right != null && Left.Type == Right.Type)
+                Type = Left.Type;
+            else
+                Type = PolyTypes.Unknown;
         }
     }
 }

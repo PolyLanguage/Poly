@@ -6,7 +6,7 @@ namespace PolyToolkit
     {
         public static Dictionary<string, PolyType> Methods = new Dictionary<string, PolyType>()
         {
-            { "print", PolyType.NoneType }
+            { "print", PolyTypes.Void }
         };
     }
 }

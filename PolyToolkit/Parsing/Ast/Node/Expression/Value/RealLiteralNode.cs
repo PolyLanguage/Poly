@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PolyToolkit.Parsing.Ast
+﻿namespace PolyToolkit.Parsing.Ast
 {
     /// <summary>
     /// Example: 1.0200300
@@ -12,7 +9,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public RealLiteralNode(AstNode parent, double value, int line) : base(parent, line)
         {
-            Type = PolyType.RealType;
+            Type = PolyTypes.Real;
             Value = value;
         }
     }

@@ -5,7 +5,8 @@ namespace PolyToolkit.Parsing.Ast
 {
     public abstract class BinaryExpressionNode : ExpressionNode
     {
-        public override List<AstNode> Childs { get => new List<AstNode>() { Left,Right }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
+        public override List<AstNode> Childs { get => new List<AstNode>() { Left, Right }; set => throw new InvalidOperationException("Childs of this node cannot be set"); }
+        public abstract MathOperation Op { get; }
 
         /// <summary>
         /// Left part of the expression
@@ -20,33 +21,12 @@ namespace PolyToolkit.Parsing.Ast
 
         public BinaryExpressionNode(AstNode parent, int line) : base(parent, line) { }
 
-        public virtual void ApplyType()
-        {
-            if (Left != null && Right != null)
-            {
-                //left & right expressions is int -> this expression is int
-                if (Left.Type == PolyType.IntType && Right.Type == PolyType.IntType)
-                    Type = PolyType.IntType;
-                //left | right expression is boolean -> this expression is boolean
-                else if (Left.Type == PolyType.BooleanType || Right.Type == PolyType.BooleanType)
-                    Type = PolyType.BooleanType;
-                else if (Left.Type == PolyType.RealType || Right.Type == PolyType.RealType)
-                    Type = PolyType.RealType;
-                else if (Left.Type == PolyType.ObjectType || Right.Type == PolyType.ObjectType)
-                    Type = PolyType.ObjectType;
-                else
-                    Type = PolyType.UnknownType;
-            }
-        }
+        protected virtual void ApplyType()
+        {}
 
         public bool IsTypesValid()
         {
-            if (Left != null && Right != null)
-            {
-                return Left.Type == Right.Type;
-            }
-            else
-                return true; // Ignore unknown types
+            return Left.Type.IsPerformable(Op, Right.Type);
         }
     }
 }

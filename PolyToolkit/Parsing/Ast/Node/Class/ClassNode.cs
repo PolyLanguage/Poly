@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace PolyToolkit.Parsing.Ast
 {
@@ -20,12 +16,6 @@ namespace PolyToolkit.Parsing.Ast
             Childs = new List<AstNode>();
         }
 
-        public override bool IsAllowed<T>()
-        {
-            if (AstExtensions.IsAllowedInClass<T>())
-                return true;
-            else
-                return false;
-        }
+        public override bool IsAllowed<T>() => AstExtensions.IsAllowedInClass<T>();
     }
 }

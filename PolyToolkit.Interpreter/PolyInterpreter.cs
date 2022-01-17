@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using PolyToolkit;
@@ -11,7 +12,7 @@ namespace PolyToolkit.Interpreter
     /// </summary>
     public sealed class PolyInterpreter
     {
-        private Stack<PolyScope> Memory { get; set; }
+        private PolyMemory Memory { get; set; }
 
         private CodeTree Tree { get; set; }
         private Entrypoint Entrypoint { get; set; }
@@ -24,7 +25,7 @@ namespace PolyToolkit.Interpreter
         /// <param name="codeEntrypoint">Start of the code</param>
         public PolyInterpreter(CodeTree tree, Entrypoint codeEntrypoint, ErrorHandler errHandler)
         {
-            Memory = new Stack<PolyScope>();
+            Memory = new PolyMemory();
 
             Tree = tree;
             Entrypoint = codeEntrypoint;
@@ -43,32 +44,40 @@ namespace PolyToolkit.Interpreter
             else
                 foreach(AstNode coreNode in Tree.Childs)
                 {
-                    //found entrypoint class
-                    if (coreNode is ClassNode && ((ClassNode)coreNode).ClassName == this.Entrypoint.Class)
+                    //define Type
+                    if(coreNode is ClassNode)
                     {
-                        // Create class scope
-                        Memory.Push(new PolyScope(this.Entrypoint.Class, PolyScope.Container.Class));
+                        ClassNode clNode = (ClassNode)coreNode;
 
-                        foreach (AstNode memberNode in coreNode.Childs)
+                        Memory.Define(clNode.ClassName, new PolySymbol(PolyTypes.ty);
+
+                        //found entrypoint class
+                        if(clNode.ClassName == this.Entrypoint.Class)
                         {
-                            // field
-                            if (memberNode is VarDeclarationStmtNode)
-                                VisitDeclareVar((VarDeclarationStmtNode)memberNode);
-                            // method
-                            else if (memberNode is MethodNode)
+                            // Create class scope
+                            Memory.AddScope(new PolyScope(this.Entrypoint.Class, PolyScope.Container.Class));
+
+                            foreach (AstNode memberNode in coreNode.Childs)
                             {
-                                MethodNode methodNode = (MethodNode)memberNode;
-
-                                // Define method in class scope
-                                Memory.Peek().Define(methodNode.MethodName, new PolySymbol(PolyType.FunctionType, new NonComputed(methodNode)));
-
-                                //found entrypoint method
-                                if (((MethodNode)memberNode).MethodName == this.Entrypoint.Method)
+                                // field
+                                if (memberNode is VarDeclarationStmtNode)
+                                    VisitDeclareVar((VarDeclarationStmtNode)memberNode);
+                                // method
+                                else if (memberNode is MethodNode)
                                 {
-                                    // Create method scope
-                                    Memory.Push(new PolyScope(this.Entrypoint.Method, PolyScope.Container.Method));
+                                    MethodNode methodNode = (MethodNode)memberNode;
 
-                                    Visit(memberNode);
+                                    // Define method in class scope
+                                    Memory.DefineInCurrent(methodNode.MethodName, new PolySymbol(PolyTypes.Function, new NonComputed(methodNode)));
+
+                                    //found entrypoint method
+                                    if (((MethodNode)memberNode).MethodName == this.Entrypoint.Method)
+                                    {
+                                        // Create method scope
+                                        Memory.AddScope(new PolyScope(this.Entrypoint.Method, PolyScope.Container.Method));
+
+                                        Visit(memberNode);
+                                    }
                                 }
                             }
                         }
@@ -84,20 +93,22 @@ namespace PolyToolkit.Interpreter
             //ctor
             else if (node is ClassCtorNode)
                 VisitCtor((ClassCtorNode)node, args);
+
         }
 
         #region Core
         private PolySymbol VisitCtor(ClassCtorNode node, PolySymbol[] args)
         {
             //TODO: return class instance
-            return new PolySymbol(PolyType.NullType, null);
+            return new PolySymbol(PolyTypes.Null, null);
         }
         private PolySymbol VisitMethod(MethodNode node, PolySymbol[] args)
         {
+            PolyScope lastMemory = Memory.Pop();
             Memory.Push(new PolyScope(node.MethodName, PolyScope.Container.Method));
 
             //define arguments in scope
-            if(node.MethodArgs.Count > 0 && node.MethodArgs.Count == args.Length)
+            if (node.MethodArgs.Count > 0 && node.MethodArgs.Count == args.Length)
             {
                 int i = 0;
                 foreach(string argName in node.MethodArgs.Keys)
@@ -107,40 +118,79 @@ namespace PolyToolkit.Interpreter
                 }
             }
 
+            Exitpoint exitpoint = new Exitpoint(node.MethodReturnType);
+
             //evaluate
             foreach (AstNode childNode in node.Childs)
             {
-                //return statement
-                if (node.MethodReturnType != PolyType.NoneType && childNode is ReturnStmtNode)
-                    return VisitExpression(((ReturnStmtNode)childNode).ReturnValue);
+                //exit on return
+                if (exitpoint.IsExited)
+                    break;
+                //continue...
                 else
-                    VisitStatement(childNode);
+                    VisitStatement(childNode, ref exitpoint);
             }
 
-            //method has no return type
-            return new PolySymbol(PolyType.NoneType, null);
+            Memory.Pop(); //remove method context
+            Memory.Push(lastMemory); //back to latest context
+
+            return exitpoint.IsExited ? exitpoint.OutValue : new PolySymbol(PolyTypes.Void, null);
         }
         #endregion
 
         #region Statement
-        private void VisitStatement(AstNode node)
+        private void VisitStatement(AstNode node, ref Exitpoint exitpoint)
         {
+            #region Statement
+            //declare var
             if (node is VarDeclarationStmtNode)
                 VisitDeclareVar((VarDeclarationStmtNode)node);
+            //assign var
             else if (node is VarAssignStmtNode)
-                ; //TODO: assign variable
+                VisitAssignVar((VarAssignStmtNode)node);
+            //expression
             else if (node is ExpressionNode)
                 VisitExpression((ExpressionNode)node);
+            #endregion
+            #region Condition
+            else if (node is IfNode)
+                VisitIfCondition((IfNode)node, ref exitpoint);
+            #endregion
+            #region Return
+            else if(node is ReturnStmtNode)
+                exitpoint.Exit(VisitExpression(((ReturnStmtNode)node).ReturnValue).Value);
+            #endregion
+            //unknown
             else
                 ErrorHandler.ReportError(node, "Not implemented");
-            //TODO: evaluate expression
             //TODO: declare function
             //TODO: declare class
         }
+        #endregion
+
+        #region Visit Statement
         private void VisitDeclareVar(VarDeclarationStmtNode node)
         {
             //register declared var in memory
-            Memory.Peek().Define(node.VarName, VisitExpression(node.VarValue));
+            Memory.Peek().Define(node.VarName, node.VarValue != null ? VisitExpression(node.VarValue)
+                : new PolySymbol(node.VarType, node.VarType.DefaultValue));
+        }
+        private void VisitAssignVar(VarAssignStmtNode node)
+        {
+            //register declared var in memory
+            Memory.Peek().Assign(node.VarName, VisitExpression(node.VarValue));
+        }
+        #endregion
+
+        #region Visit Condition
+        private void VisitIfCondition(IfNode node, ref Exitpoint exitpoint)
+        {
+            if((bool)VisitExpression(node.Condition).Value)
+            {
+                foreach (AstNode childNode in node.Childs)
+                    VisitStatement(childNode, ref exitpoint);
+            }
+            //TODO: else if, else
         }
         #endregion
 
@@ -149,15 +199,34 @@ namespace PolyToolkit.Interpreter
         {
             //literals
             if (node is NullLiteralNode)
-                return new PolySymbol(PolyType.NullType, null);
+                return new PolySymbol(PolyTypes.Null, null);
             else if (node is IntLiteralNode)
-                return new PolySymbol(PolyType.IntType, ((IntLiteralNode)node).Value);
+                return new PolySymbol(PolyTypes.Int, ((IntLiteralNode)node).Value);
             else if (node is RealLiteralNode)
-                return new PolySymbol(PolyType.RealType, ((RealLiteralNode)node).Value);
+                return new PolySymbol(PolyTypes.Real, ((RealLiteralNode)node).Value);
             else if (node is StringLiteralNode)
-                return new PolySymbol(PolyType.StringType, ((StringLiteralNode)node).Value);
+                return new PolySymbol(PolyTypes.String, ((StringLiteralNode)node).Value);
             else if (node is BoolLiteralNode)
-                return new PolySymbol(PolyType.BooleanType, ((BoolLiteralNode)node).Value);
+                return new PolySymbol(PolyTypes.Bool, ((BoolLiteralNode)node).Value);
+            else if (node is ArrayLiteralNode)
+            {
+                PolyType arrayType = ((ArrayLiteralNode)node).Type;
+
+                //create array
+                ArrayList val = new ArrayList();
+                //Array val = Array.CreateInstance(arrayType.ToNativeType(), 1000); //TODO: do something with length
+
+                //visit array items expressions, fill array value
+                int i = 0;
+                foreach (ExpressionNode arrayItem in ((ArrayLiteralNode)node).Values)
+                {
+                    val.Add(VisitExpression(arrayItem).Value);
+                    //val.SetValue(VisitExpression(arrayItem).Value, i);
+                    i++;
+                }
+
+                return new PolySymbol(arrayType, val);
+            }
             //var
             else if (node is VarNameNode)
                 return GetValue(((VarNameNode)node).Name);
@@ -183,14 +252,14 @@ namespace PolyToolkit.Interpreter
                     else
                         ErrorHandler.ReportError(methodCallNode, "Method accepts only 1 argument");
 
-                    return new PolySymbol(PolyType.NullType, null);
+                    return new PolySymbol(PolyTypes.Null, null);
                 }
                 //defined method
                 else
                 {
                     PolySymbol method = GetValue(((MethodCallNode)node).Name);
 
-                    if (method.Type == PolyType.FunctionType && method.Value is NonComputed)
+                    if (method.Type == PolyTypes.Function && method.Value is NonComputed)
                     {
                         //evaluate arguments
                         PolySymbol[] args = new PolySymbol[methodCallNode.Args.Count];
@@ -204,29 +273,36 @@ namespace PolyToolkit.Interpreter
                     else
                     {
                         ErrorHandler.ReportError(node, $"Cannot call '{((VarNameNode)node).Name}', value was {method.Type} instead of method");
-                        return new PolySymbol(PolyType.UnknownType, null);
+                        return new PolySymbol(PolyTypes.Unknown, null);
                     }
                 }
             }
-            //arithmetic
-            else if (node is AddExpressionNode)
+            //array index
+            else if (node is ArrayIndexNode)
             {
-                AddExpressionNode addnode = (AddExpressionNode)node;
+                ArrayIndexNode indxnode = (ArrayIndexNode)node;
 
-                return VisitExpression(addnode.Left) + VisitExpression(addnode.Right);
+                ArrayList arr = (ArrayList)GetValue(indxnode.Name).Value;
+                //Array arr = (Array)GetValue(indxnode.Name).Value;
+                int index = (int)VisitExpression(indxnode.Index).Value;
+
+                return new PolySymbol(indxnode.Type, arr[index]);
+                //return new PolySymbol(indxnode.Type, arr.GetValue(index));
             }
-            else if (node is SubtractExpressionNode)
+            //operation
+            else if (node is BinaryExpressionNode)
             {
-                SubtractExpressionNode subnode = (SubtractExpressionNode)node;
-                return VisitExpression(subnode.Left) - VisitExpression(subnode.Right);
+                BinaryExpressionNode binNode = (BinaryExpressionNode)node;
+                return VisitExpression(binNode.Left).Perform(binNode.Op, VisitExpression(binNode.Right));
             }
             //unknown
             else
             {
                 ErrorHandler.ReportError(node, "Not implemented expression");
-                return new PolySymbol(PolyType.UnknownType, null);
+                return new PolySymbol(PolyTypes.Unknown, null);
             }
         }
+
         private PolySymbol GetValue(string name)
         {
             // loop all scopes
@@ -239,6 +315,19 @@ namespace PolyToolkit.Interpreter
 
             // not found
             return null;
+        }
+        private bool IsDefined(string name)
+        {
+            // loop all scopes
+            foreach (PolyScope scope in Memory)
+            {
+                // defined in current scope
+                if (scope.IsDefined(name))
+                    return true;
+            }
+
+            // not found
+            return false;
         }
         #endregion
     }

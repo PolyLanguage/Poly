@@ -12,7 +12,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public BoolLiteralNode(AstNode parent, bool value, int line) : base(parent, line)
         {
-            Type = PolyType.BooleanType;
+            Type = PolyTypes.Bool;
             Value = value;
         }
     }
