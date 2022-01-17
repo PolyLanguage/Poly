@@ -4,13 +4,11 @@ Poly is Object-Oriented Static-typed and Strong-structured programming language
 # Syntax
 Basic hello world code:
 ```c#
-import: 'System';
-
 namespace: 'MyProgram';
-class program
+
+class Program
 {
-    <entry>
-    method int main(string[] args)
+    method Main(string[] args)
     {
         print('hello world !');
     }
@@ -19,6 +17,7 @@ class program
 Basic Object-oriented code:
 ```c#
 namespace: 'MyProgram';
+
 class car
 {
     string name;
@@ -34,18 +33,13 @@ class car
         self.name = '';
     }
 }
-class ferrari : car
+
+class Program
 {
-    //adds additional code to inherited class
-    ctor(string _name) += 
+    method Main(string[] args)
     {
-        self.price = 250000;
-    }
-    
-    //overrides code of method
-    method reset_name() =
-    {
-        self.name = 'ferrari';
+        car mycar = new car('bmw');
+        print(mycar.name);
     }
 }
 ```
