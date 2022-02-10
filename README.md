@@ -8,7 +8,7 @@ namespace: 'MyProgram';
 
 class Program
 {
-    method Main(string[] args)
+    method Main(array<string> args)
     {
         print('hello world !');
     }
@@ -54,9 +54,11 @@ class Program
     - [x] If (if(cond) {})
     - [ ] ElseIf (else if(cond) {})
     - [ ] Else (else {})
+- [x] Loops
     - [ ] While ... Do, Do ... While
     - [ ] For
     - [ ] Foreach
+    - [x] Repeat
 - [x] Class declaration (class name {})
 - [ ] Static classes (static class name {})
 - [ ] Class fields (field name;)
@@ -65,8 +67,19 @@ class Program
 - [ ] System library
     - [x] print(value)
     - [x] printin(value)
-    - [ ] isnull(value)
-    - [ ] memory.delete(varName)
+    - [x] read()
+    - [x] gettype(value)
+    - [x] tostring()
+    - [ ] toint()
+    - [ ] toreal()
+    - [ ] tobool()
+    - [ ] toarray()
+    - [ ] time()
+    - [ ] string.length
+    - [ ] array.length
+    - [ ] array.find
+    - [ ] array.map
+    - [ ] array.reduce
 - [x] Expressions
     - [x] +, -, *, /, % (Arithemtic)
     - [x] &&, || (Boolean)
@@ -79,6 +92,7 @@ class Program
     - [x] String type ('abc')
         - [ ] String formatting ($'hello ${abc}')
     - [x] Array type ([])
+    - [x] T of types (array<array<int>>)
     - [ ] Object type ({})
     - [ ] Lambda type(() => {})
     - [x] Method calls (abc())
