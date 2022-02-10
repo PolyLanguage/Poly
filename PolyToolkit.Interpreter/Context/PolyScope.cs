@@ -8,9 +8,10 @@ namespace PolyToolkit.Interpreter
         public enum Container
         {
             Global,
+            Class,
             Instance,
             Method,
-            Loop
+            Block
         }
 
         public string Name { get; }

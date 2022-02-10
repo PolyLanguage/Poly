@@ -29,5 +29,6 @@ namespace PolyToolkit.Parsing.Ast
             else
                 return VarType == VarValue.Type;
         }
+
     }
 }

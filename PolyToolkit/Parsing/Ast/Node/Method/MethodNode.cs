@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace PolyToolkit.Parsing.Ast
 {
@@ -15,6 +11,7 @@ namespace PolyToolkit.Parsing.Ast
 
         public PolyType MethodReturnType { get; set; }
         public string MethodName { get; set; }
+        public bool IsStatic { get; set; } = false;
         public Dictionary<string,PolyType> MethodArgs { get; set; }
 
         public MethodNode(AstNode parent, int line) : base(parent, line)

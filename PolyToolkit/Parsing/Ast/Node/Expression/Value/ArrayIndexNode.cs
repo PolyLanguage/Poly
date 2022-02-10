@@ -11,19 +11,18 @@ namespace PolyToolkit.Parsing.Ast
         public override List<AstNode> Childs { get => new List<AstNode>(); set => throw new InvalidOperationException("Childs of this node cannot be set"); }
 
         /// <summary>
-        /// Name of the array to get
+        /// Array value
         /// </summary>
-        public string Name { get; }
+        public ExpressionNode Array { get; }
         /// <summary>
         /// Index of item in array
         /// </summary>
-        public ExpressionNode Index { get; }
+        public ExpressionNode Index { get; set; }
 
-        public ArrayIndexNode(AstNode parent, string varname, PolyType arrayType, ExpressionNode index, int line) : base(parent, line)
+        public ArrayIndexNode(AstNode parent, ExpressionNode arr, int line) : base(parent, line)
         {
-            Name = varname;
-            Type = arrayType;
-            Index = index;
+            Array = arr;
+            Type = arr.Type.T;
         }
     }
 }

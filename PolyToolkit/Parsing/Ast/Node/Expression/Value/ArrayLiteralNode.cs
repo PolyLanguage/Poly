@@ -10,7 +10,7 @@
         public ArrayLiteralNode(AstNode parent, PolyType valuesType, ExpressionNode[] values, int line) : base(parent, line)
         {
             Type = new PolyTypeArray();
-            Type.Of(valuesType);
+            Type = Type.Of(valuesType);
 
             Values = values;
         }

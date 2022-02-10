@@ -40,30 +40,13 @@ namespace PolyToolkit.Interpreter
 
         private bool IsValid() => (this.Value == null && this.Type.CanBeNull) || (this.Value.GetType() == this.Type.ToNativeType());
 
-        public bool IsInt { get { return this.Type.Name == PolyTypes.Int.Name; } }
-        public bool IsReal { get { return this.Type.Name == PolyTypes.Real.Name; } }
-        public bool IsBool { get { return this.Type.Name == PolyTypes.Bool.Name; } }
-        public bool IsString { get { return this.Type.Name == PolyTypes.String.Name; } }
-        public bool IsArray { get { return this.Type.Name == PolyTypes.Array.Name; } }
-
-        #region Boolean Operations
-        public static bool operator true(PolySymbol symb) => symb.IsBool && (bool)symb.Value;
-        public static bool operator false(PolySymbol symb) => symb.IsBool && !(bool)symb.Value;
-
-        public static PolySymbol operator &(PolySymbol a, PolySymbol b)
-        {
-            return new PolySymbol(PolyTypes.Bool,
-                (a.IsBool && (bool)a.Value == true)
-                &&
-                (a.IsBool && (bool)b.Value == true));
-        }
-        public static PolySymbol operator |(PolySymbol a, PolySymbol b)
-        {
-            return new PolySymbol(PolyTypes.Bool,
-                (a.IsBool && (bool)a.Value == true)
-                ||
-                (a.IsBool && (bool)b.Value == true));
-        }
-        #endregion
+        public bool IsInt { get => this.Type.Name == PolyTypes.Int.Name; }
+        public bool IsReal { get => this.Type.Name == PolyTypes.Real.Name; }
+        public bool IsBool { get => this.Type.Name == PolyTypes.Bool.Name; }
+        public bool IsString { get => this.Type.Name == PolyTypes.String.Name; }
+        public bool IsArray { get => this.Type.Name == PolyTypes.Array.Name; }
+        public bool IsClass { get => this.Type.Name == PolyTypes.Class.Name; }
+        public bool IsInstance { get => this.Type.Name == PolyTypes.Instance.Name; }
+        public bool IsMethod { get => this.Type.Name == PolyTypes.Method.Name; }
     }
 }

@@ -12,10 +12,12 @@
     <None Remove="Context\" />
     <None Remove="Debug\" />
     <None Remove="Other\" />
+    <None Remove="PolyLibrary\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Context\" />
     <Folder Include="Debug\" />
     <Folder Include="Other\" />
+    <Folder Include="Library\" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 namespace PolyToolkit.Interpreter
 {
-    public static class PolyTypeExtensions
+    public static class PolySymbolExtensions
     {
         /// <summary>
         /// Perform operation
@@ -110,9 +110,9 @@ namespace PolyToolkit.Interpreter
                         else
                             return new PolySymbol(PolyTypes.Unknown, null);
                     case MathOperation.Equals:
-                        return new PolySymbol(PolyTypes.Bool, a.Type == b.Type && a.Value == b.Value);
+                        return new PolySymbol(PolyTypes.Bool, a.Type == b.Type && object.Equals(a.Value, b.Value));
                     case MathOperation.NotEquals:
-                        return new PolySymbol(PolyTypes.Bool, a.Type != b.Type && a.Value != b.Value);
+                        return new PolySymbol(PolyTypes.Bool, a.Type != b.Type && !object.Equals(a.Value, b.Value));
                     case MathOperation.And:
                         if (type is PolyTypeBool)
                             return new PolySymbol(PolyTypes.Int, (bool)a.Value && (bool)b.Value);

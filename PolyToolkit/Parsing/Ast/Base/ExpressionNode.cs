@@ -13,5 +13,10 @@
         public bool IsConstant { get; set; } = false;
 
         public ExpressionNode(AstNode parent, int line) : base(parent, line) { }
+
+        public void MutateType(PolyType type)
+        {
+            Type = type;
+        }
     }
 }

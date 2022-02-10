@@ -14,6 +14,7 @@
         /// </summary>
         public PolySymbol OutValue { get; private set; }
 
+        public bool IsBreaked { get; private set; }
         public bool IsExited { get; private set; }
 
         public Exitpoint(PolyType outValType)
@@ -21,6 +22,7 @@
             OutValueType = outValType;
             OutValue = null;
 
+            IsBreaked = false;
             IsExited = false;
         }
 
@@ -28,10 +30,18 @@
         /// Exit current context
         /// </summary>
         /// <param name="value"></param>
-        public void Exit(object value)
+        public void Exit(PolySymbol value)
         {
-            OutValue = new PolySymbol(OutValueType, value);
+            OutValue = value;
             IsExited = true;
+        }
+
+        /// <summary>
+        /// Break current loop
+        /// </summary>
+        public void Break()
+        {
+            IsBreaked = true;
         }
     }
 }

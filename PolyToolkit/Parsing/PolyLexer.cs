@@ -19,6 +19,10 @@ namespace PolyToolkit.Parsing
         {
             '-','+','*','/','%','=','>','<','!','?','&','|'
         };
+        private static string[] MultiCharOperators = new string[]
+        {
+            "==", "!=", "<=", ">="
+        };
         private static char[] SpecialChars = new char[]
         {
             '#',',','^','$','@','~'
@@ -98,21 +102,20 @@ namespace PolyToolkit.Parsing
         //operator token: +-*& etc
         private PolyToken NextOperator(char ch)
         {
-            string value = ch.ToString();
+            char ch2 = Code[Position];
 
-            while (Position < Length)
+            // Multichar operator exists
+            if (IsOperator(ch2) && MultiCharOperators.Contains(ch.ToString() + ch2))
             {
-                var ch2 = Code[Position];
-
-                if (!IsOperator(ch2))
-                    break;
-
-                value += ch2;
                 Position++;
+                return new PolyToken(ch.ToString() + ch2, PolyTokenType.Operator);
             }
-
-            return new PolyToken(value, PolyTokenType.Operator);
+            else
+            {
+                return new PolyToken(ch.ToString(), PolyTokenType.Operator);
+            }
         }
+
         //int token: 2184
         private PolyToken NextInteger(char ch)
         {

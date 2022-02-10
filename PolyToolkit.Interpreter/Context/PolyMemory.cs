@@ -8,7 +8,7 @@ namespace PolyToolkit.Interpreter
     /// </summary>
     public sealed class PolyMemory
     {
-        private Stack<PolyScope> Stack;
+        public Stack<PolyScope> Stack { get; }
 
         /// <summary>
         /// Get scope at the top of the stack
@@ -44,6 +44,10 @@ namespace PolyToolkit.Interpreter
         /// <summary>
         /// Push class instance scope to the memory stack
         /// </summary>
+        public void NowClass(string className) => Now(className, PolyScope.Container.Class);
+        /// <summary>
+        /// Push class instance scope to the memory stack
+        /// </summary>
         public void NowInstance(string className) => Now(className, PolyScope.Container.Instance);
         /// <summary>
         /// Push method scope to the memory stack
@@ -52,24 +56,51 @@ namespace PolyToolkit.Interpreter
         /// <summary>
         /// Push loop scope to the memory stack
         /// </summary>
-        public void NowLoop(string loopName) => Now(loopName, PolyScope.Container.Loop);
+        public void NowLoop(string loopName) => Now(loopName, PolyScope.Container.Block);
 
-        public PolyScope Back() => this.Stack.Pop();
+        /// <summary>
+        /// Pop scope from the stack
+        /// </summary>
+        /// <returns></returns>
+        public PolyScope Pop() => Stack.Pop();
+        /// <summary>
+        /// Push scope to the stack
+        /// </summary>
+        /// <param name="scope"></param>
+        public void Push(PolyScope scope) => Stack.Push(scope);
         #endregion
 
         #region Symbols
         /// <summary>
-        /// Check if symbol defined in current scope
+        /// Get value of symbol based on current scope
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool IsDefined(string name)
+        public PolySymbol GetValue(string name)
         {
-            return Stack.Peek().IsDefined(name);
+            // loop all scopes
+            int i = 0;
+            foreach (PolyScope scope in Stack)
+            {
+                //not (method && next method)
+                if (!(Current.ContainerType == PolyScope.Container.Method && i == 0 && scope.ContainerType == PolyScope.Container.Method))
+                    if (scope.IsDefined(name))
+                        return scope.Get(name);
+                i++;
+            }
+
+            // not found
+            return null;
         }
+
+        /// <summary>
+        /// Define symbol in current scope
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="symbol"></param>
         public void Define(string name, PolySymbol symbol)
         {
-            Stack.Peek().Define(name, symbol);
+            Current.Define(name, symbol);
         }
         #endregion
     }

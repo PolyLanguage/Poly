@@ -7,6 +7,17 @@ namespace PolyToolkit.Parsing.Ast
 {
     public static class AstExtensions
     {
+        #region IsInside
+        /// <summary>
+        /// Is node inside loop?
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static bool IsInsideLoop(this AstNode container)
+        {
+            return container.GetFirstParent<RepeatNode>() != null;
+        }
+        #endregion
         #region IsContains
         /// <summary>
         /// Check if container has node of specified type
@@ -103,32 +114,27 @@ namespace PolyToolkit.Parsing.Ast
         #region IsAllowedIn
         public static bool IsAllowedInGlobal<T>() where T : AstNode
         {
-            if (typeof(T) == typeof(ClassNode) ||
+           return typeof(T) == typeof(ClassNode) ||
                 typeof(T) == typeof(NamespaceStmtNode) ||
-                typeof(T) == typeof(ImportStmtNode))
-                return true;
-            else
-                return false;
+                typeof(T) == typeof(ImportStmtNode);
         }
         public static bool IsAllowedInClass<T>()where T : AstNode
         {
-            if (typeof(T) == typeof(VarDeclarationStmtNode) ||
+            return typeof(T) == typeof(FieldNode) ||
                 typeof(T) == typeof(ClassCtorNode) ||
-                typeof(T) == typeof(MethodNode))
-                return true;
-            else
-                return false;
+                typeof(T) == typeof(MethodNode);
         }
         public static bool IsAllowedInMethod<T>()where T : AstNode
         {
-            if (typeof(T) == typeof(ExpressionNode) ||
+            return typeof(T) == typeof(ExpressionNode) ||
                 typeof(T) == typeof(VarDeclarationStmtNode) ||
                 typeof(T) == typeof(VarAssignStmtNode) ||
                 typeof(T) == typeof(ReturnStmtNode) ||
-                typeof(T) == typeof(IfNode))
-                return true;
-            else
-                return false;
+                typeof(T) == typeof(BreakStmtNode) ||
+                typeof(T) == typeof(IfNode) ||
+                typeof(T) == typeof(ElseIfNode) ||
+                typeof(T) == typeof(ElseNode) ||
+                typeof(T) == typeof(RepeatNode);
         }
         public static bool IsAllowedInCondition<T>() where T : AstNode
         {
@@ -205,6 +211,9 @@ namespace PolyToolkit.Parsing.Ast
                     //is var constant
                     if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == name)
                         return ((VarDeclarationStmtNode)node).IsConstant;
+                    //is field constant
+                    else if (node is FieldNode && ((FieldNode)node).VarName == name)
+                        return ((FieldNode)node).IsConstant;
                     //methods and classes are constants
                     else if (node is MethodNode && ((MethodNode)node).MethodName == name)
                         return true;
@@ -216,10 +225,14 @@ namespace PolyToolkit.Parsing.Ast
             if (container.Parent != null && container.Parent is CodeTree == false)
                 return container.Parent.GetIsConstant(name);
 
-            //TODO: in system library (property)
+
+            IDescriptor libEntityDescriptor = SystemLibrary.GetModule("@").Get(name);
             //in system library (method)
-            if (SystemLibrary.Methods.ContainsKey(name))
+            if (libEntityDescriptor != null && libEntityDescriptor is MethodDescriptor)
                 return true;
+            //in system library (field)
+            if (libEntityDescriptor != null && libEntityDescriptor is FieldDescriptor)
+                return !((FieldDescriptor)libEntityDescriptor).SetAllowed;
 
             return false;
         }
@@ -232,9 +245,12 @@ namespace PolyToolkit.Parsing.Ast
         /// <returns></returns>
         public static PolyType GetNameType(this AstNode container, string name)
         {
-            //check in args (if method or ctor)
             if (container is MethodNode)
             {
+                // Method itself
+                if (((MethodNode)container).MethodName == name)
+                    return PolyTypes.Method;
+                // Method arg
                 foreach (string arg in ((MethodNode)container).MethodArgs.Keys)
                 {
                     if (arg == name)
@@ -257,14 +273,22 @@ namespace PolyToolkit.Parsing.Ast
                     }
                 }
             }
+            else if (container is ClassNode)
+            {
+                // Class itself
+                if (((ClassNode)container).ClassName == name)
+                    return PolyTypes.Class;
+            }
 
             //in current container
             if (container is BlockNode)
                 foreach (AstNode node in container.Childs)
                     if (node is VarDeclarationStmtNode && ((VarDeclarationStmtNode)node).VarName == name)
                         return ((VarDeclarationStmtNode)node).VarType;
+                    else if (node is FieldNode && ((FieldNode)node).VarName == name)
+                        return ((FieldNode)node).VarType;
                     else if (node is MethodNode && ((MethodNode)node).MethodName == name)
-                        return PolyTypes.Function;
+                        return PolyTypes.Method;
                     //TODO: else if(node is ClassNode && .ClassName == name) return type
                     //TODO: CtorNode
 
@@ -272,10 +296,13 @@ namespace PolyToolkit.Parsing.Ast
             if (container.Parent != null && container.Parent is CodeTree == false)
                 return container.Parent.GetNameType(name);
 
-            //TODO: in system library (property)
+            IDescriptor libEntityDescriptor = SystemLibrary.GetModule("@").Get(name);
             //in system library (method)
-            if (SystemLibrary.Methods.ContainsKey(name))
-                return PolyTypes.Function;
+            if (libEntityDescriptor != null && libEntityDescriptor is MethodDescriptor)
+                return PolyTypes.Method;
+            //in system library (field)
+            if (libEntityDescriptor != null && libEntityDescriptor is FieldDescriptor)
+                return ((FieldDescriptor)libEntityDescriptor).Type;
 
             return PolyTypes.Unknown;
         }
@@ -287,6 +314,10 @@ namespace PolyToolkit.Parsing.Ast
         /// <returns></returns>
         public static PolyType GetMethodType(this AstNode container, string name)
         {
+            //container itself
+            if (container is MethodNode && ((MethodNode)container).MethodName == name)
+                return ((MethodNode)container).MethodReturnType;
+
             //in current container
             if (container is BlockNode)
                 foreach (AstNode node in container.Childs)
@@ -296,6 +327,13 @@ namespace PolyToolkit.Parsing.Ast
             //in parent container
             if (container.Parent != null && container.Parent is CodeTree == false)
                 return container.Parent.GetMethodType(name);
+
+
+
+            MethodDescriptor methodDescriptor = SystemLibrary.GetModule("@").GetMethod(name);
+            //in system library (method)
+            if (methodDescriptor != null)
+                return methodDescriptor.Returns;
 
             return PolyTypes.Unknown;
         }

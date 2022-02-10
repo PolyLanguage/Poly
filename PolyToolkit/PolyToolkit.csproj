@@ -19,5 +19,15 @@
     <Folder Include="Parsing\Ast\Statement\Variable\" />
     <Folder Include="Parsing\Ast\Node\Condition\" />
     <Folder Include="Parsing\Ast\Node\Expression\Operation\Logical\" />
+    <Folder Include="Parsing\Ast\Node\Field\" />
+    <Folder Include="Parsing\Ast\Node\Loop\" />
+    <Folder Include="PolyLibrary\" />
+    <Folder Include="PolyLibrary\Descriptor\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Parsing\Ast\Node\Field\" />
+    <None Remove="Parsing\Ast\Node\Loop\" />
+    <None Remove="PolyLibrary\" />
+    <None Remove="PolyLibrary\Descriptor\" />
   </ItemGroup>
 </Project>

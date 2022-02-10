@@ -1,12 +1,13 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{430BFFD6-9FA9-4C53-950F-F477174DC980}|Default">
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="321" Column="61" IsPinned="True" />
-      <File FileName="PolyToolkit.Interpreter/PolySymbol.cs" Line="49" Column="35" />
-      <File FileName="PolyToolkit.Interpreter/PolyInterpreter.cs" Line="51" Column="1" />
-      <File FileName="PolyToolkit.Interpreter/PolyMemory.cs" Line="67" Column="10" />
-      <File FileName="PolyToolkit.Interpreter/Context/PolyScope.cs" Line="3" Column="1" />
-      <File FileName="PolyToolkit/Core/PolyType.cs" Line="126" Column="18" />
+      <File FileName="PolyToolkit/Parsing/PolyParser.cs" Line="902" Column="1" IsPinned="True" />
+      <File FileName="PolyToolkit.Interpreter/PolyInterpreter.cs" Line="250" Column="49" />
+      <File FileName="PolyToolkit/Library/SystemLibrary.cs" Line="17" Column="1" />
+      <File FileName="PolyToolkit.Interpreter/Library/GlobalModule.cs" Line="38" Column="48" />
+      <File FileName="PolyToolkit.Interpreter/Context/PolySymbol.cs" Line="1" Column="1" />
+      <File FileName="PolyToolkit/Core/PolyType.cs" Line="42" Column="27" />
+      <File FileName="PolyToolkit/Parsing/Ast/Node/Expression/Value/ArrayLiteralNode.cs" Line="13" Column="20" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,24 +19,15 @@
             <Node name="Toolkit" expanded="True">
               <Node name="First Gen" expanded="True">
                 <Node name="PolyToolkit" expanded="True">
-                  <Node name="Compilation" expanded="True" />
-                  <Node name="Core" expanded="True">
-                    <Node name="PolyType.cs" selected="True" />
-                  </Node>
+                  <Node name="Core" expanded="True" />
+                  <Node name="Library" expanded="True" />
                   <Node name="Parsing" expanded="True">
                     <Node name="Ast" expanded="True">
                       <Node name="Base" expanded="True" />
                       <Node name="Node" expanded="True">
-                        <Node name="Class" expanded="True" />
-                        <Node name="Condition" expanded="True" />
                         <Node name="Expression" expanded="True">
-                          <Node name="Operation" expanded="True">
-                            <Node name="Boolean" expanded="True" />
-                            <Node name="Logical" expanded="True" />
-                          </Node>
                           <Node name="Value" expanded="True" />
                         </Node>
-                        <Node name="Method" expanded="True" />
                       </Node>
                       <Node name="Statement" expanded="True">
                         <Node name="Variable" expanded="True" />
@@ -43,9 +35,11 @@
                     </Node>
                   </Node>
                 </Node>
-                <Node name="PolyToolkit.Compilation.IL" expanded="True" />
                 <Node name="PolyToolkit.Interpreter" expanded="True">
                   <Node name="Context" expanded="True" />
+                  <Node name="Library" expanded="True">
+                    <Node name="GlobalModule.cs" selected="True" />
+                  </Node>
                   <Node name="Other" expanded="True" />
                 </Node>
               </Node>

@@ -1,13 +1,4 @@
-﻿using PolyToolkit.Parsing.Ast;
-namespace PolyToolkit
+﻿namespace PolyToolkit
 {
-    public struct NonComputed
-    {
-        public AstNode Node { get; }
-
-        public NonComputed(AstNode node)
-        {
-            Node = node;
-        }
-    }
+    public interface INonComputed { }
 }

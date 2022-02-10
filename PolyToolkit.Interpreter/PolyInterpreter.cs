@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using PolyToolkit;
+using PolyToolkit.Interpreter.Library;
 using PolyToolkit.Parsing;
 using PolyToolkit.Parsing.Ast;
 namespace PolyToolkit.Interpreter
@@ -42,103 +43,28 @@ namespace PolyToolkit.Interpreter
                 ErrorHandler.ReportError(Tree, "Code was empty");
             }
             else
-                foreach(AstNode coreNode in Tree.Childs)
-                {
-                    //define Type
-                    if(coreNode is ClassNode)
-                    {
-                        ClassNode clNode = (ClassNode)coreNode;
-
-                        Memory.Define(clNode.ClassName, new PolySymbol(PolyTypes.ty);
-
-                        //found entrypoint class
-                        if(clNode.ClassName == this.Entrypoint.Class)
-                        {
-                            // Create class scope
-                            Memory.AddScope(new PolyScope(this.Entrypoint.Class, PolyScope.Container.Class));
-
-                            foreach (AstNode memberNode in coreNode.Childs)
-                            {
-                                // field
-                                if (memberNode is VarDeclarationStmtNode)
-                                    VisitDeclareVar((VarDeclarationStmtNode)memberNode);
-                                // method
-                                else if (memberNode is MethodNode)
-                                {
-                                    MethodNode methodNode = (MethodNode)memberNode;
-
-                                    // Define method in class scope
-                                    Memory.DefineInCurrent(methodNode.MethodName, new PolySymbol(PolyTypes.Function, new NonComputed(methodNode)));
-
-                                    //found entrypoint method
-                                    if (((MethodNode)memberNode).MethodName == this.Entrypoint.Method)
-                                    {
-                                        // Create method scope
-                                        Memory.AddScope(new PolyScope(this.Entrypoint.Method, PolyScope.Container.Method));
-
-                                        Visit(memberNode);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }    
-        }
-
-        private void Visit(AstNode node, PolySymbol[] args = null)
-        {
-            //method
-            if (node is MethodNode)
-                VisitMethod((MethodNode)node, args);
-            //ctor
-            else if (node is ClassCtorNode)
-                VisitCtor((ClassCtorNode)node, args);
-
-        }
-
-        #region Core
-        private PolySymbol VisitCtor(ClassCtorNode node, PolySymbol[] args)
-        {
-            //TODO: return class instance
-            return new PolySymbol(PolyTypes.Null, null);
-        }
-        private PolySymbol VisitMethod(MethodNode node, PolySymbol[] args)
-        {
-            PolyScope lastMemory = Memory.Pop();
-            Memory.Push(new PolyScope(node.MethodName, PolyScope.Container.Method));
-
-            //define arguments in scope
-            if (node.MethodArgs.Count > 0 && node.MethodArgs.Count == args.Length)
             {
-                int i = 0;
-                foreach(string argName in node.MethodArgs.Keys)
+                //create global scope
+                Memory.NowGlobal();
+
+                //every node in global
+                foreach (AstNode coreNode in Tree.Childs)
                 {
-                    Memory.Peek().Define(argName, args[i]);
-                    i++;
+                    if (coreNode is ClassNode)
+                        VisitDeclareClass((ClassNode)coreNode);
+                }
+
+                //start evaluation
+                PolySymbol entryClass = Memory.GetValue(Entrypoint.Class);
+                if(entryClass != null && entryClass.IsClass)
+                {
+                    //TODO: pass string[] args to method
+                    CallClassMethod((NonComputedClass)entryClass.Value, Entrypoint.Method, new PolySymbol[] {});
                 }
             }
-
-            Exitpoint exitpoint = new Exitpoint(node.MethodReturnType);
-
-            //evaluate
-            foreach (AstNode childNode in node.Childs)
-            {
-                //exit on return
-                if (exitpoint.IsExited)
-                    break;
-                //continue...
-                else
-                    VisitStatement(childNode, ref exitpoint);
-            }
-
-            Memory.Pop(); //remove method context
-            Memory.Push(lastMemory); //back to latest context
-
-            return exitpoint.IsExited ? exitpoint.OutValue : new PolySymbol(PolyTypes.Void, null);
         }
-        #endregion
 
-        #region Statement
+        #region Visit Statement
         private void VisitStatement(AstNode node, ref Exitpoint exitpoint)
         {
             #region Statement
@@ -150,52 +76,160 @@ namespace PolyToolkit.Interpreter
                 VisitAssignVar((VarAssignStmtNode)node);
             //expression
             else if (node is ExpressionNode)
-                VisitExpression((ExpressionNode)node);
+                CallExpression((ExpressionNode)node);
             #endregion
             #region Condition
             else if (node is IfNode)
                 VisitIfCondition((IfNode)node, ref exitpoint);
             #endregion
-            #region Return
-            else if(node is ReturnStmtNode)
-                exitpoint.Exit(VisitExpression(((ReturnStmtNode)node).ReturnValue).Value);
+            #region Loop
+            else if (node is RepeatNode)
+                VisitRepeatLoop((RepeatNode)node, ref exitpoint);
+            #endregion
+            #region Return/Break
+            else if (node is ReturnStmtNode)
+                exitpoint.Exit(CallExpression(((ReturnStmtNode)node).ReturnValue));
+            else if (node is BreakStmtNode)
+                exitpoint.Break();
             #endregion
             //unknown
             else
-                ErrorHandler.ReportError(node, "Not implemented");
+                ErrorHandler.ReportError(node, $"Not implemented: ({node.GetType()})");
             //TODO: declare function
             //TODO: declare class
         }
-        #endregion
-
-        #region Visit Statement
+        private void VisitStatements(List<AstNode> nodes, ref Exitpoint exitpoint)
+        {
+            foreach (AstNode childNode in nodes)
+            {
+                //exit on return
+                if (exitpoint.IsExited)
+                    return;
+                //return ?
+                else if(childNode is ReturnStmtNode)
+                {
+                    exitpoint.Exit(CallExpression(((ReturnStmtNode)childNode).ReturnValue));
+                    break;
+                }
+                //continue...
+                else
+                    VisitStatement(childNode, ref exitpoint);
+            }
+        }
         private void VisitDeclareVar(VarDeclarationStmtNode node)
         {
-            //register declared var in memory
-            Memory.Peek().Define(node.VarName, node.VarValue != null ? VisitExpression(node.VarValue)
-                : new PolySymbol(node.VarType, node.VarType.DefaultValue));
+            //register declared var in memory (if value not specified -> use default value)
+            Memory.Define(node.VarName, node.VarValue != null ? CallExpression(node.VarValue)
+                : new PolySymbol(node.VarType, node.VarType.DefaultValue, node.IsConstant));
+        }
+        private void VisitDeclareField(FieldNode node)
+        {
+            //register field in memory (if value not specified -> use default value)
+            Memory.Define(node.VarName, node.VarValue != null ? CallExpression(node.VarValue)
+                : new PolySymbol(node.VarType, node.VarType.DefaultValue, node.IsConstant));
         }
         private void VisitAssignVar(VarAssignStmtNode node)
         {
             //register declared var in memory
-            Memory.Peek().Assign(node.VarName, VisitExpression(node.VarValue));
+            Memory.Current.Assign(node.VarName, CallExpression(node.VarValue));
+        }
+
+        private void VisitDeclareClass(ClassNode node)
+        {
+            Memory.Define(node.ClassName, new PolySymbol(PolyTypes.Class, new NonComputedClass(node), true));
+        }
+        private void VisitDeclareMethod(MethodNode node)
+        {
+            Memory.Define(node.MethodName, new PolySymbol(PolyTypes.Method, new NonComputedMethod(node), true));
         }
         #endregion
 
         #region Visit Condition
         private void VisitIfCondition(IfNode node, ref Exitpoint exitpoint)
         {
-            if((bool)VisitExpression(node.Condition).Value)
-            {
-                foreach (AstNode childNode in node.Childs)
-                    VisitStatement(childNode, ref exitpoint);
-            }
+            //if condition met
+            if((bool)CallExpression(node.Condition).Value)
+                VisitStatements(node.Childs, ref exitpoint);
+
             //TODO: else if, else
         }
         #endregion
 
-        #region Expression
-        private PolySymbol VisitExpression(ExpressionNode node)
+        #region Visit Loop
+        private void VisitRepeatLoop(RepeatNode node, ref Exitpoint exitpoint)
+        {
+            PolySymbol times = CallExpression(node.Times);
+
+            Exitpoint exitpointLoop = new Exitpoint();
+            for (int i = 0; i < (int)times.Value; i++)
+            {
+                //return
+                if (exitpointLoop.IsExited)
+                    exitpoint.Exit(exitpointLoop.OutValue);
+                //break
+                else if (exitpointLoop.IsBreaked)
+                    break;
+
+                //repeat code
+                VisitStatements(node.Childs, ref exitpointLoop);
+            }
+        }
+        #endregion
+
+        #region Call
+        private PolySymbol CallClassMethod(NonComputedClass cls, string methodName, PolySymbol[] args)
+        {
+            PolySymbol result = new PolySymbol(PolyTypes.Unknown, null);
+            Memory.NowClass(cls.Node.ClassName);
+
+            //define methods, props in scope
+            foreach (AstNode childNode in cls.Node.Childs)
+            {
+                if (childNode is FieldNode && !((FieldNode)childNode).IsStatic)
+                    VisitDeclareField((FieldNode)childNode);
+                //TODO: dont define static methods in scope
+                else if (childNode is MethodNode)
+                    VisitDeclareMethod((MethodNode)childNode);
+            }
+
+            PolySymbol methodSymb = Memory.GetValue(methodName);
+            if (methodSymb != null && methodSymb.IsMethod)
+            {
+                NonComputedMethod method = (NonComputedMethod)methodSymb.Value;
+                result = CallMethod(method, args);
+            }
+            //else
+            //TODO: error
+
+            Memory.Pop(); //remove method context
+
+            return result;
+        }
+        private PolySymbol CallMethod(NonComputedMethod method, PolySymbol[] args)
+        {
+            Memory.NowMethod(method.Node.MethodName);
+
+            //define arguments in scope
+            if (method.Node.MethodArgs.Count > 0 && method.Node.MethodArgs.Count == args.Length)
+            {
+                int i = 0;
+                foreach (string argName in method.Node.MethodArgs.Keys)
+                {
+                    Memory.Define(argName, args[i]);
+                    i++;
+                }
+            }
+
+            Exitpoint exitpoint = new Exitpoint(method.Node.MethodReturnType);
+            //evaluate
+            VisitStatements(method.Node.Childs, ref exitpoint);
+
+            Memory.Pop(); //remove method context
+
+            return exitpoint.IsExited ? exitpoint.OutValue : new PolySymbol(PolyTypes.Void, null);
+        }
+
+        private PolySymbol CallExpression(ExpressionNode node)
         {
             //literals
             if (node is NullLiteralNode)
@@ -214,14 +248,12 @@ namespace PolyToolkit.Interpreter
 
                 //create array
                 ArrayList val = new ArrayList();
-                //Array val = Array.CreateInstance(arrayType.ToNativeType(), 1000); //TODO: do something with length
 
                 //visit array items expressions, fill array value
                 int i = 0;
                 foreach (ExpressionNode arrayItem in ((ArrayLiteralNode)node).Values)
                 {
-                    val.Add(VisitExpression(arrayItem).Value);
-                    //val.SetValue(VisitExpression(arrayItem).Value, i);
+                    val.Add(CallExpression(arrayItem));
                     i++;
                 }
 
@@ -229,7 +261,7 @@ namespace PolyToolkit.Interpreter
             }
             //var
             else if (node is VarNameNode)
-                return GetValue(((VarNameNode)node).Name);
+                return Memory.GetValue(((VarNameNode)node).Name);
             //call
             else if (node is MethodCallNode)
             {
@@ -238,41 +270,69 @@ namespace PolyToolkit.Interpreter
                 //TODO: better way to check if is library method
 
                 //system method
-                if (methodCallNode.Name == "print")
+                if (SystemLibrary.GetModule("@").IsHasMethod(methodCallNode.Name))
                 {
-                    //evaluate arguments
-                    PolySymbol[] args = new PolySymbol[methodCallNode.Args.Count];
-                    for (var i = 0; i < args.Length; i++)
-                    {
-                        args[i] = VisitExpression(methodCallNode.Args[i]);
-                    }
+                    MethodDescriptor methodDescriptor = SystemLibrary.GetModule("@").GetMethod(methodCallNode.Name);
 
-                    if (args.Length == 1)
-                        Console.WriteLine(args[0].Value);
+                    //same arguments counts
+                    if(methodDescriptor.Arguments.Count == methodCallNode.Args.Count)
+                    {
+                        //check arguments types
+                        for(int i = 0; i < methodDescriptor.Arguments.Count; i++)
+                        {
+                            //TODO: dont check arguments types, it should be checked in parser
+                            //arguments types doesn't match
+                            if(methodDescriptor.Arguments[i] != PolyTypes.Object && methodDescriptor.Arguments[i] != methodCallNode.Args[i].Type)
+                            {
+                                ErrorHandler.ReportError(methodCallNode, $"Method '{methodCallNode.Name}' {i + 1}th argument should be of {methodDescriptor.Arguments[i]} type");
+                                return new PolySymbol(PolyTypes.Null, null);
+                            }
+                        }
+
+                        //evaluate arguments
+                        PolySymbol[] args = new PolySymbol[methodCallNode.Args.Count];
+                        for (var i = 0; i < args.Length; i++)
+                        {
+                            args[i] = CallExpression(methodCallNode.Args[i]);
+                        }
+
+                        //call method
+                        return SystemLibraryImpl.Modules["@"].Methods[methodDescriptor.Name](args);
+                    }
+                    //different argument count
                     else
-                        ErrorHandler.ReportError(methodCallNode, "Method accepts only 1 argument");
+                        ErrorHandler.ReportError(methodCallNode, $"Method '{methodCallNode.Name}' accepts only {methodDescriptor.Arguments.Count} argument(s), but passed {methodCallNode.Args.Count}");
 
                     return new PolySymbol(PolyTypes.Null, null);
                 }
                 //defined method
                 else
                 {
-                    PolySymbol method = GetValue(((MethodCallNode)node).Name);
+                    PolySymbol definedSymbol = Memory.GetValue(((MethodCallNode)node).Name);
 
-                    if (method.Type == PolyTypes.Function && method.Value is NonComputed)
+                    if (definedSymbol != null)
                     {
-                        //evaluate arguments
-                        PolySymbol[] args = new PolySymbol[methodCallNode.Args.Count];
-                        for (var i = 0; i < args.Length; i++)
-                            args[i] = VisitExpression(methodCallNode.Args[i]);
+                        if(definedSymbol.Type == PolyTypes.Method && definedSymbol.Value is NonComputedMethod)
+                        {
+                            //evaluate arguments
+                            PolySymbol[] args = new PolySymbol[methodCallNode.Args.Count];
+                            for (var i = 0; i < args.Length; i++)
+                                args[i] = CallExpression(methodCallNode.Args[i]);
 
-                        //TODO: check if method dont accepts that arguments
+                            //TODO: check if method dont accepts that arguments
 
-                        return VisitMethod((MethodNode)((NonComputed)method.Value).Node, args);
+                            //call method
+                            return CallMethod((NonComputedMethod)definedSymbol.Value, args);
+                        }
+                        else
+                        {
+                            ErrorHandler.ReportError(node, $"Cannot call '{((MethodCallNode)node).Name}', value was {definedSymbol.Type} instead of method");
+                            return new PolySymbol(PolyTypes.Unknown, null);
+                        }
                     }
                     else
                     {
-                        ErrorHandler.ReportError(node, $"Cannot call '{((VarNameNode)node).Name}', value was {method.Type} instead of method");
+                        ErrorHandler.ReportError(node, $"Cannot call '{((MethodCallNode)node).Name}', method was not defined");
                         return new PolySymbol(PolyTypes.Unknown, null);
                     }
                 }
@@ -282,52 +342,39 @@ namespace PolyToolkit.Interpreter
             {
                 ArrayIndexNode indxnode = (ArrayIndexNode)node;
 
-                ArrayList arr = (ArrayList)GetValue(indxnode.Name).Value;
-                //Array arr = (Array)GetValue(indxnode.Name).Value;
-                int index = (int)VisitExpression(indxnode.Index).Value;
+                ArrayList arr = (ArrayList)CallExpression(indxnode.Array).Value;
+                int index = (int)CallExpression(indxnode.Index).Value;
 
-                return new PolySymbol(indxnode.Type, arr[index]);
-                //return new PolySymbol(indxnode.Type, arr.GetValue(index));
+                if(index < arr.Count)
+                    return new PolySymbol(indxnode.Type, arr[index]);
+                else
+                    ErrorHandler.ReportError(node, $"Array index out of bounds (length: {arr.Count}, index: {index})");
+
+                return new PolySymbol(PolyTypes.Unknown, null);
             }
             //operation
             else if (node is BinaryExpressionNode)
             {
                 BinaryExpressionNode binNode = (BinaryExpressionNode)node;
-                return VisitExpression(binNode.Left).Perform(binNode.Op, VisitExpression(binNode.Right));
+                return CallExpression(binNode.Left).Perform(binNode.Op, CallExpression(binNode.Right));
             }
-            //unknown
+            //error
+            else if(node == null)
+            {
+                Console.Write("null expr now");
+                ErrorHandler.ReportError(node, $"Null expression");
+                return new PolySymbol(PolyTypes.Unknown, null);
+            }
+            //not implemented
             else
             {
-                ErrorHandler.ReportError(node, "Not implemented expression");
+                ErrorHandler.ReportError(node, $"Not implemented expression ({node.GetType()})");
                 return new PolySymbol(PolyTypes.Unknown, null);
             }
         }
-
-        private PolySymbol GetValue(string name)
+        private PolySymbol CallNewInstance(NonComputedInstance instance, PolySymbol[] args)
         {
-            // loop all scopes
-            foreach(PolyScope scope in Memory)
-            {
-                // defined in current scope
-                if (scope.IsDefined(name))
-                    return scope.Get(name);
-            }
-
-            // not found
-            return null;
-        }
-        private bool IsDefined(string name)
-        {
-            // loop all scopes
-            foreach (PolyScope scope in Memory)
-            {
-                // defined in current scope
-                if (scope.IsDefined(name))
-                    return true;
-            }
-
-            // not found
-            return false;
+            return new PolySymbol(PolyTypes.Unknown, null);
         }
         #endregion
     }

@@ -1,10 +1,14 @@
-﻿using System;
-namespace PolyToolkit.Core.NonComputed
+﻿using PolyToolkit.Parsing.Ast;
+
+namespace PolyToolkit
 {
-    public class NonComputedMethod
+    public sealed class NonComputedMethod : INonComputed
     {
-        public NonComputedMethod()
+        public MethodNode Node { get; }
+
+        public NonComputedMethod(MethodNode node)
         {
+            Node = node;
         }
     }
 }
