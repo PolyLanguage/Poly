@@ -36,7 +36,7 @@ class car
 
 class Program
 {
-    method Main(string[] args)
+    method Main(array<string> args)
     {
         car mycar = new car('bmw');
         print(mycar.name);
