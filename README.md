@@ -43,3 +43,45 @@ class Program
     }
 }
 ```
+
+# Progress
+- [x] Namespace (namespace 'name';)
+- [ ] Import (import 'name';)
+- [x] Variable declaration (type name = value;)
+- [x] Variable assigning (name = value;)
+- [x] Return (return value;)
+- [x] Conditions
+    - [x] If (if(cond) {})
+    - [ ] ElseIf (else if(cond) {})
+    - [ ] Else (else {})
+    - [ ] While ... Do, Do ... While
+    - [ ] For
+    - [ ] Foreach
+- [x] Class declaration (class name {})
+- [ ] Static classes (static class name {})
+- [ ] Class fields (field name;)
+- [ ] Class methods (method type name(args){})
+- [x] Method declaration (method type name(args) {})
+- [ ] System library
+    - [x] print(value)
+    - [x] printin(value)
+    - [ ] isnull(value)
+    - [ ] memory.delete(varName)
+- [x] Expressions
+    - [x] +, -, *, /, % (Arithemtic)
+    - [x] &&, || (Boolean)
+    - [x] ==, !=, <, >, <=, >= (Boolean)
+    - [ ] ? (true ? true : false)
+    - [ ] ?? (true ?? true)
+    - [x] Number type (123)
+    - [x] Real type (1.0)
+    - [x] Boolean type (true/false)
+    - [x] String type ('abc')
+        - [ ] String formatting ($'hello ${abc}')
+    - [x] Array type ([])
+    - [ ] Object type ({})
+    - [ ] Lambda type(() => {})
+    - [x] Method calls (abc())
+    - [x] Array calls (abc[0+1])
+    - [ ] Dot expressions (abc.cdf.ghj)
+    - [ ] Instance creation
